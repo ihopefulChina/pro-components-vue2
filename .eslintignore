@@ -1,0 +1,9 @@
+node_modules/
+dist/
+*.min.js
+coverage/
+.nyc_output/
+.vscode/
+.idea/
+*.log
+.DS_Store
