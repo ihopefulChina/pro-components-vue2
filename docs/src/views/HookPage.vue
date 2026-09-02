@@ -41,8 +41,8 @@
     </article>
     <template #toc>
       <p>本页内容</p>
-      <a href="#example">使用示例</a>
-      <a href="#api">API</a>
+      <RouterLink :to="{ path: $route.path, hash: '#example' }">使用示例</RouterLink>
+      <RouterLink :to="{ path: $route.path, hash: '#api' }">API</RouterLink>
     </template>
   </SiteShell>
 </template>

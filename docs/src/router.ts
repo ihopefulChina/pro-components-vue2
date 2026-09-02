@@ -27,7 +27,7 @@ const routes: RouteConfig[] = [
 const router = new VueRouter({
   mode: "hash",
   routes,
-  scrollBehavior: () => ({ x: 0, y: 0 }),
+  scrollBehavior: to => (to.hash ? { selector: to.hash, offset: { x: 0, y: 72 } } : { x: 0, y: 0 }),
 });
 
 router.afterEach(route => {

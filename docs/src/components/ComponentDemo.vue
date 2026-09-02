@@ -1,5 +1,5 @@
 <template>
-  <div class="component-demo">
+  <div :key="name" class="component-demo">
     <ProForm
       v-if="name === 'ProForm'"
       :initial-value="profile"

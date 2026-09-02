@@ -60,8 +60,8 @@
     </article>
     <template #toc>
       <p>本页内容</p>
-      <a href="#demo">基础用法</a>
-      <a href="#api">API</a>
+      <RouterLink :to="{ path: $route.path, hash: '#demo' }">基础用法</RouterLink>
+      <RouterLink :to="{ path: $route.path, hash: '#api' }">API</RouterLink>
       <small>v{{ doc.since }}</small>
     </template>
   </SiteShell>

@@ -1,6 +1,8 @@
 import { componentDocs } from "../../docs/src/content/components";
+import ComponentDemo from "../../docs/src/components/ComponentDemo.vue";
 import { guides } from "../../docs/src/content/guides";
 import { hookDocs } from "../../docs/src/content/hooks";
+import { mount } from "@vue/test-utils";
 
 describe("documentation inventory", () => {
   it("documents every public component exactly once", () => {
@@ -19,5 +21,18 @@ describe("documentation inventory", () => {
     expect(hookDocs).toHaveLength(10);
     expect(guides).toHaveLength(4);
     expect(new Set([...hookDocs, ...guides].map(item => item.slug)).size).toBe(14);
+  });
+
+  it("replaces the live example when navigating between form field pages", async () => {
+    const wrapper = mount(ComponentDemo, {
+      propsData: { name: "ProFormDependency" },
+    });
+
+    expect(wrapper.text()).toContain("高级配置");
+
+    await wrapper.setProps({ name: "ProFormText" });
+
+    expect(wrapper.text()).toContain("项目名称");
+    expect(wrapper.text()).not.toContain("高级配置");
   });
 });
