@@ -17,26 +17,26 @@
 
 ```bash
 # 使用发布脚本
-npm run release
+pnpm release
 ```
 
 #### 手动发布
 
 ```bash
 # 1. 安装依赖
-npm install
+pnpm install --frozen-lockfile
 
 # 2. 运行测试
-npm run test
+pnpm test
 
 # 3. 代码检查
-npm run lint:check
+pnpm lint:check
 
 # 4. 类型检查
-npm run type-check
+pnpm type-check
 
 # 5. 构建
-npm run build:lib
+pnpm build:lib
 
 # 6. 发布
 npm publish
@@ -91,7 +91,7 @@ GitHub Actions 会自动处理 CI/CD 流程：
 - 代码检查
 - 测试
 - 构建
-- 自动发布到 NPM（当推送到 main 分支时）
+- 推送 `v*` 标签时自动发布到 NPM；普通 main 分支提交只运行验证
 
 ## 文档部署
 

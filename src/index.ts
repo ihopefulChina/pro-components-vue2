@@ -44,10 +44,10 @@ export { useSuperLock } from "./hooks/useSuperLock";
 export { guid } from "./utils/guid";
 
 // 类型导出
-export * from "./components/proForm/type/index.d";
-export * from "./components/proForm/types";
-export * from "./components/proTable/type.d";
-export * from "./components/searchForm/types";
+export type { FormInstance, ProFormProvide } from "./components/proForm/type";
+export type * from "./components/proForm/types";
+export type * from "./components/proTable/type";
+export type * from "./components/searchForm/types";
 
 // 默认导出所有组件
 import CustomTabs from "./components/customTabs/index.vue";
@@ -55,6 +55,23 @@ import DrawerForm from "./components/proForm/DrawerForm.vue";
 import ModalForm from "./components/proForm/ModalForm.vue";
 import ProForm from "./components/proForm/ProForm.vue";
 import ProFormItem from "./components/proForm/ProFormItem.vue";
+import ProFormCascader from "./components/proForm/fields/ProFormCascader.vue";
+import ProFormCheckbox from "./components/proForm/fields/ProFormCheckbox.vue";
+import ProFormDate from "./components/proForm/fields/ProFormDate.vue";
+import ProFormDependency from "./components/proForm/fields/ProFormDependency.vue";
+import ProFormDynamicTags from "./components/proForm/fields/ProFormDynamicTags.vue";
+import ProFormInfo from "./components/proForm/fields/ProFormInfo.vue";
+import ProFormList from "./components/proForm/fields/ProFormList.vue";
+import ProFormNumber from "./components/proForm/fields/ProFormNumber.vue";
+import ProFormRadio from "./components/proForm/fields/ProFormRadio.vue";
+import ProFormRange from "./components/proForm/fields/ProFormRange.vue";
+import ProFormRate from "./components/proForm/fields/ProFormRate.vue";
+import ProFormSelect from "./components/proForm/fields/ProFormSelect.vue";
+import ProFormSlider from "./components/proForm/fields/ProFormSlider.vue";
+import ProFormSwitch from "./components/proForm/fields/ProFormSwitch.vue";
+import ProFormText from "./components/proForm/fields/ProFormText.vue";
+import ProFormTextarea from "./components/proForm/fields/ProFormTextarea.vue";
+import ProFormUpload from "./components/proForm/fields/ProFormUpload.vue";
 import ProTable from "./components/proTable/index.vue";
 import SearchForm from "./components/searchForm/index.vue";
 import Segmented from "./components/segmented/index.vue";
@@ -62,6 +79,23 @@ import Segmented from "./components/segmented/index.vue";
 const components = [
   ProForm,
   ProFormItem,
+  ProFormCascader,
+  ProFormCheckbox,
+  ProFormDate,
+  ProFormDependency,
+  ProFormDynamicTags,
+  ProFormInfo,
+  ProFormList,
+  ProFormNumber,
+  ProFormRadio,
+  ProFormRange,
+  ProFormRate,
+  ProFormSelect,
+  ProFormSlider,
+  ProFormSwitch,
+  ProFormText,
+  ProFormTextarea,
+  ProFormUpload,
   ModalForm,
   DrawerForm,
   ProTable,
@@ -76,14 +110,4 @@ const install = (Vue: any) => {
   });
 };
 
-export default {
-  install,
-  ProForm,
-  ProFormItem,
-  ModalForm,
-  DrawerForm,
-  ProTable,
-  SearchForm,
-  CustomTabs,
-  Segmented,
-};
+export default { install };

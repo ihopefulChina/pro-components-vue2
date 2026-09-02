@@ -1,5 +1,12 @@
 <template>
-  <ProFormItem :name="name" :label="label" :span="span" :required="required" :rules="rules" :tooltip="tooltip">
+  <ProFormItem
+    :name="name"
+    :label="label"
+    :span="span"
+    :required="required"
+    :rules="rules"
+    :tooltip="tooltip"
+  >
     <el-date-picker
       v-model="dateValue"
       :type="type"
@@ -11,123 +18,107 @@
       :value-format="valueFormat"
       :start-placeholder="startPlaceholder"
       :end-placeholder="endPlaceholder"
+      class="pro-form-date-picker"
       v-bind="$attrs"
-      style="width: 500px"
     />
   </ProFormItem>
 </template>
 
 <script lang="ts">
-import { defineComponent, computed, PropType } from "@vue/composition-api"
-import ProFormItem from "../ProFormItem.vue"
+import { defineComponent, computed, PropType } from "@vue/composition-api";
+import ProFormItem from "../ProFormItem.vue";
 
 export default defineComponent({
   name: "ProFormDate",
-  inheritAttrs: false,
   components: { ProFormItem },
+  inheritAttrs: false,
   props: {
     // 表单项属性
     name: {
       type: String,
-      required: true
+      required: true,
     },
     label: {
       type: String,
-      required: true
+      required: true,
     },
     span: {
       type: Number,
-      default: 24
+      default: 24,
     },
     required: {
       type: Boolean,
-      default: false
+      default: false,
     },
     rules: {
       type: Array,
-      default: () => []
+      default: () => [],
     },
     // 提示信息
     tooltip: {
       type: String,
-      default: ""
+      default: "",
     },
     // 日期选择器属性
     value: {
       type: [String, Date, Array, Number],
-      default: undefined
+      default: undefined,
     },
     type: {
       type: String as PropType<"date" | "daterange" | "datetime" | "datetimerange">,
-      default: "date"
+      default: "date",
     },
     startPlaceholder: {
       type: String,
-      default: "开始时间"
+      default: "开始时间",
     },
     endPlaceholder: {
       type: String,
-      default: "结束时间"
+      default: "结束时间",
     },
     placeholder: {
       type: String,
-      default: "请选择"
+      default: "请选择",
     },
     disabled: {
       type: Boolean,
-      default: false
+      default: false,
     },
     readonly: {
       type: Boolean,
-      default: false
+      default: false,
     },
     clearable: {
       type: Boolean,
-      default: true
+      default: true,
     },
     format: {
       type: String,
-      default: "yyyy-MM-dd"
+      default: undefined,
     },
     valueFormat: {
       type: String,
-      default: "yyyy-MM-dd"
-    }
+      default: undefined,
+    },
   },
   emits: ["input"],
   setup(props, { emit }) {
     const dateValue = computed({
-      get: () => {
-        // 如果是时间戳，转换为日期字符串
-        if (typeof props.value === "number") {
-          return new Date(props.value)
-            .toISOString()
-            .slice(0, 19)
-            .replace("T", " ")
-        }
-        // 如果是数组（daterange），处理数组中的每个元素
-        if (Array.isArray(props.value)) {
-          const result = props.value.map(item => {
-            if (typeof item === "number") {
-              return new Date(item)
-                .toISOString()
-                .slice(0, 19)
-                .replace("T", " ")
-            }
-            return item
-          })
-          return result
-        }
-        return props.value
-      },
+      get: () => props.value,
       set: val => {
-        emit("input", val)
-      }
-    })
+        emit("input", val);
+      },
+    });
 
     return {
-      dateValue
-    }
-  }
-})
+      dateValue,
+    };
+  },
+});
 </script>
+
+<style lang="scss" scoped>
+.pro-form-date-picker {
+  width: 100%;
+}
+</style>

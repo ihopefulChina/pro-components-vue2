@@ -1,0 +1,7 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 128 128" role="img" aria-labelledby="title desc">
+  <title id="title">Pro Components Vue2</title>
+  <desc id="desc">由组件框架、字母 P 与数字 2 负空间组成的标志</desc>
+  <path fill="#101828" d="M28 12h66l12 12H22zM104 30l12 12v58l-12 12zM34 104h72l-12 12H22zM12 34l12-12v84l-12-12z"/>
+  <path fill="#13c2c2" d="M100 12h16v16zM12 100l16 16H12z"/>
+  <path fill="#1677ff" d="M36 34h32c20 0 34 12 34 30 0 13-7 22-20 31l-13 9H48l25-21c9-7 13-12 13-19 0-9-7-15-18-15H53v18h17L52 83v21H36z"/>
+</svg>

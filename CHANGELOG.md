@@ -7,7 +7,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
-## [1.0.0] - 2025-10-17
+## [1.0.0] - 2026-09-02
 
 ### Added
 
@@ -21,6 +21,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Comprehensive hooks collection
 - TypeScript support
 - Full documentation
+
+### Fixed
+
+- Corrected the Vue 2.6 Composition API runtime and type-checking toolchain
+- Restored Vue 2 `v-model` behavior for search forms and form fields
+- Fixed async submission loading, dynamic tag deletion, stale table requests, and zero-value rendering
+- Corrected package entry points, CSS exports, global field registration, CI, and release scripts
+- Added keyboard-accessible tabs and segmented controls
 
 ### Components
 

@@ -1,5 +1,14 @@
 <template>
-  <el-dialog class="modal-form" :visible.sync="open" :width="width" :before-close="handleClose" :destroy-on-close="true" :close-on-click-modal="false" center>
+  <el-dialog
+    class="modal-form"
+    :visible="open"
+    :width="width"
+    :before-close="handleBeforeClose"
+    destroy-on-close
+    :close-on-click-modal="false"
+    center
+    @closed="resetForm"
+  >
     <template #title>
       <span class="modal-title">{{ title }}</span>
     </template>
@@ -7,16 +16,15 @@
     <div class="modal-content">
       <ProForm
         ref="proForm"
-        :initialValue="initialValue"
+        :initial-value="initialValue"
         :rules="rules"
         :readonly="isDetail"
         :disabled="isDetail"
-        inDrawer
-        @submit="handleSubmit"
+        :submitter="handleSubmit"
         @cancel="handleClose"
       >
-        <template #default="{ formData, isDetail }">
-          <slot :form-data="formData" :is-detail="isDetail"></slot>
+        <template #default="{ formData, isDetail: slotIsDetail }">
+          <slot :form-data="formData" :is-detail="slotIsDetail" />
         </template>
       </ProForm>
     </div>
@@ -24,8 +32,8 @@
 </template>
 
 <script lang="ts">
-import { defineComponent, ref } from "@vue/composition-api"
-import ProForm from "./ProForm.vue"
+import { defineComponent, PropType, ref } from "@vue/composition-api";
+import ProForm from "./ProForm.vue";
 
 export default defineComponent({
   name: "ModalForm",
@@ -42,35 +50,57 @@ export default defineComponent({
     /** 表单验证规则 */
     rules: { type: Object, default: () => ({}) },
     /** 弹窗宽度 */
-    width: { type: String, default: "800px" }
+    width: { type: [String, Number], default: "800px" },
+    /** 可等待的提交函数 */
+    submitter: {
+      type: Function as PropType<(values: Record<string, unknown>) => void | Promise<void>>,
+      default: undefined,
+    },
+    /** 关闭回调 */
+    onClose: {
+      type: Function as PropType<() => void>,
+      default: undefined,
+    },
   },
-  emits: ["onClose", "onSubmit"],
+  emits: ["close", "submit"],
   setup(props, { emit }) {
-    const proForm = ref<InstanceType<typeof ProForm> | null>(null)
+    const proForm = ref<InstanceType<typeof ProForm> | null>(null);
 
     /**
      * 关闭弹窗
      */
     const handleClose = () => {
-      emit("onClose")
-      proForm.value?.reset()
-    }
+      props.onClose?.();
+      emit("close");
+    };
+
+    const handleBeforeClose = (done: () => void) => {
+      handleClose();
+      done();
+    };
+
+    const resetForm = () => {
+      proForm.value?.reset();
+    };
 
     /**
      * 处理 ProForm 的提交事件
      * @param formData - 表单数据
      */
-    const handleSubmit = (formData: Record<string, any>) => {
-      emit("onSubmit", formData)
-    }
+    const handleSubmit = async (formData: Record<string, unknown>) => {
+      await props.submitter?.(formData);
+      emit("submit", formData);
+    };
 
     return {
       proForm,
       handleClose,
-      handleSubmit
-    }
-  }
-})
+      handleBeforeClose,
+      resetForm,
+      handleSubmit,
+    };
+  },
+});
 </script>
 
 <style lang="scss" scoped>

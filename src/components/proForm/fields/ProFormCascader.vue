@@ -1,5 +1,12 @@
 <template>
-  <ProFormItem :name="name" :label="label" :span="span" :required="required" :rules="rules" :tooltip="tooltip">
+  <ProFormItem
+    :name="name"
+    :label="label"
+    :span="span"
+    :required="required"
+    :rules="rules"
+    :tooltip="tooltip"
+  >
     <el-cascader
       v-model="cascaderValue"
       :options="options"
@@ -20,179 +27,189 @@
       :tag-type="tagType"
       :validate-event="validateEvent"
       v-bind="$attrs"
+      @change="handleChange"
+      @expand-change="handleExpandChange"
+      @blur="handleBlur"
+      @focus="handleFocus"
+      @visible-change="handleVisibleChange"
+      @remove-tag="handleRemoveTag"
     />
   </ProFormItem>
 </template>
 
 <script lang="ts">
-import { defineComponent, computed, PropType } from "@vue/composition-api"
-import ProFormItem from "../ProFormItem.vue"
+import { defineComponent, computed, PropType } from "@vue/composition-api";
+import ProFormItem from "../ProFormItem.vue";
 
 interface CascaderOption {
-  value: any
-  label: string
-  children?: CascaderOption[]
-  disabled?: boolean
-  leaf?: boolean
+  value: any;
+  label: string;
+  children?: CascaderOption[];
+  disabled?: boolean;
+  leaf?: boolean;
 }
 
 interface CascaderProps {
-  expandTrigger?: "click" | "hover"
-  multiple?: boolean
-  checkStrictly?: boolean
-  emitPath?: boolean
-  lazy?: boolean
-  lazyLoad?: (node: any, resolve: any) => void
-  value?: string
-  label?: string
-  children?: string
-  disabled?: string | ((data: any, node: any) => boolean)
-  leaf?: string | ((data: any, node: any) => boolean)
+  expandTrigger?: "click" | "hover";
+  multiple?: boolean;
+  checkStrictly?: boolean;
+  emitPath?: boolean;
+  lazy?: boolean;
+  lazyLoad?: (node: any, resolve: any) => void;
+  value?: string;
+  label?: string;
+  children?: string;
+  disabled?: string | ((data: any, node: any) => boolean);
+  leaf?: string | ((data: any, node: any) => boolean);
 }
 
 export default defineComponent({
   name: "ProFormCascader",
-  inheritAttrs: false,
   components: { ProFormItem },
+  inheritAttrs: false,
   props: {
     // 表单项属性
     name: {
       type: String,
-      required: true
+      required: true,
     },
     label: {
       type: String,
-      required: true
+      required: true,
     },
     span: {
       type: Number,
-      default: 24
+      default: 24,
     },
     required: {
       type: Boolean,
-      default: false
+      default: false,
     },
     rules: {
       type: Array,
-      default: () => []
+      default: () => [],
     },
     // 提示信息
     tooltip: {
       type: String,
-      default: ""
+      default: "",
     },
     // 级联选择器属性
     value: {
       type: [String, Number, Array],
-      default: undefined
+      default: undefined,
     },
     options: {
       type: Array as PropType<CascaderOption[]>,
-      default: () => []
+      default: () => [],
     },
     cascaderProps: {
       type: Object as PropType<CascaderProps>,
-      default: () => ({})
+      default: () => ({}),
     },
     size: {
       type: String,
-      default: "medium"
+      default: "medium",
     },
     placeholder: {
       type: String,
-      default: "请选择"
+      default: "请选择",
     },
     disabled: {
       type: Boolean,
-      default: false
+      default: false,
     },
     clearable: {
       type: Boolean,
-      default: true
+      default: true,
     },
     showAllLevels: {
       type: Boolean,
-      default: true
+      default: true,
     },
     collapseTags: {
       type: Boolean,
-      default: false
+      default: false,
     },
     separator: {
       type: String,
-      default: " / "
+      default: " / ",
     },
     filterable: {
       type: Boolean,
-      default: false
+      default: false,
     },
     filterMethod: {
       type: Function as PropType<(node: any, keyword: string) => boolean>,
-      default: undefined
+      default: undefined,
     },
     debounce: {
       type: Number,
-      default: 300
+      default: 300,
     },
     beforeFilter: {
       type: Function as PropType<(value: string) => boolean>,
-      default: undefined
+      default: undefined,
     },
     popperClass: {
       type: String,
-      default: ""
+      default: "",
     },
     popperAppendToBody: {
       type: Boolean,
-      default: true
+      default: true,
     },
     tagType: {
       type: String,
-      default: "info"
+      default: "info",
     },
     validateEvent: {
       type: Boolean,
-      default: true
-    }
+      default: true,
+    },
   },
   emits: ["input", "change", "expand-change", "blur", "focus", "visible-change", "remove-tag"],
   setup(props, { emit }) {
     const cascaderValue = computed({
       get: () => props.value,
       set: val => {
-        emit("input", val)
-        emit("change", val)
-      }
-    })
+        emit("input", val);
+      },
+    });
+
+    const handleChange = (value: unknown) => {
+      emit("change", value);
+    };
 
     const handleExpandChange = (value: any) => {
-      emit("expand-change", value)
-    }
+      emit("expand-change", value);
+    };
 
     const handleBlur = (event: Event) => {
-      emit("blur", event)
-    }
+      emit("blur", event);
+    };
 
     const handleFocus = (event: Event) => {
-      emit("focus", event)
-    }
+      emit("focus", event);
+    };
 
     const handleVisibleChange = (visible: boolean) => {
-      emit("visible-change", visible)
-    }
+      emit("visible-change", visible);
+    };
 
     const handleRemoveTag = (value: any) => {
-      emit("remove-tag", value)
-    }
+      emit("remove-tag", value);
+    };
 
     return {
       cascaderValue,
+      handleChange,
       handleExpandChange,
       handleBlur,
       handleFocus,
       handleVisibleChange,
-      handleRemoveTag
-    }
-  }
-})
+      handleRemoveTag,
+    };
+  },
+});
 </script>

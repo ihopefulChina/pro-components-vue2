@@ -1,11 +1,12 @@
 <template>
   <el-drawer
     class="drawer-form"
-    :visible.sync="open"
+    :visible="open"
     :size="width"
-    :before-close="handleClose"
-    :destroy-on-close="true"
+    :before-close="handleBeforeClose"
+    destroy-on-close
     :close-on-click-modal="false"
+    @closed="resetForm"
   >
     <template #title>
       <span class="drawer-title">{{ title }}</span>
@@ -14,16 +15,16 @@
     <div class="drawer-content">
       <ProForm
         ref="proForm"
-        :initialValue="initialValue"
+        :initial-value="initialValue"
         :rules="rules"
         :readonly="isDetail"
         :disabled="isDetail"
-        :inDrawer="true"
-        @submit="handleSubmit"
+        in-drawer
+        :submitter="handleSubmit"
         @cancel="handleClose"
       >
-        <template #default="{ formData, isDetail }">
-          <slot :form-data="formData" :is-detail="isDetail"></slot>
+        <template #default="{ formData, isDetail: slotIsDetail }">
+          <slot :form-data="formData" :is-detail="slotIsDetail" />
         </template>
       </ProForm>
     </div>
@@ -31,7 +32,7 @@
 </template>
 
 <script lang="ts">
-import { defineComponent, ref } from "vue";
+import { defineComponent, PropType, ref } from "@vue/composition-api";
 import ProForm from "./ProForm.vue";
 
 export default defineComponent({
@@ -50,26 +51,48 @@ export default defineComponent({
     /** 表单验证规则 */
     rules: { type: Object, default: () => ({}) },
     /** 抽屉宽度 */
-    width: { type: String, default: "800px" },
+    width: { type: [String, Number], default: "800px" },
+    /** 可等待的提交函数 */
+    submitter: {
+      type: Function as PropType<(values: Record<string, unknown>) => void | Promise<void>>,
+      default: undefined,
+    },
+    /** 关闭回调，便于配合 useDrawerForm 的 v-bind 用法 */
+    onClose: {
+      type: Function as PropType<() => void>,
+      default: undefined,
+    },
   },
-  emits: ["onClose", "onSubmit"],
+  emits: ["close", "submit"],
   setup(props, { emit }) {
     const proForm = ref<InstanceType<typeof ProForm> | null>(null);
 
     // 关闭弹窗
     const handleClose = () => {
-      emit("onClose");
+      props.onClose?.();
+      emit("close");
+    };
+
+    const handleBeforeClose = (done: () => void) => {
+      handleClose();
+      done();
+    };
+
+    const resetForm = () => {
       proForm.value?.reset();
     };
 
     // 处理 ProForm 的提交事件
-    const handleSubmit = (formData: Record<string, any>) => {
-      emit("onSubmit", formData);
+    const handleSubmit = async (formData: Record<string, unknown>) => {
+      await props.submitter?.(formData);
+      emit("submit", formData);
     };
 
     return {
       proForm,
       handleClose,
+      handleBeforeClose,
+      resetForm,
       handleSubmit,
     };
   },
@@ -87,24 +110,12 @@ export default defineComponent({
   padding: 0 20px;
   padding-bottom: 80px;
   overflow-y: auto;
+  max-height: calc(100vh - 80px);
 }
 
 .drawer-title {
   font-size: 18px;
   font-weight: 900;
   color: #333;
-}
-
-.drawer-footer {
-  position: absolute;
-  bottom: 0;
-  left: 0;
-  right: 0;
-  padding: 20px;
-  border-top: 1px solid #e8e8e8;
-  background: #fff;
-  text-align: right;
-  z-index: 10;
-  box-shadow: 0 -2px 8px rgba(0, 0, 0, 0.1);
 }
 </style>

@@ -13,25 +13,17 @@ const version = packageJson.version;
 console.log(`🚀 开始发布版本 ${version}`);
 
 try {
-  // 1. 运行测试
-  console.log("📋 运行测试...");
-  execSync("npm run test", { stdio: "inherit" });
+  // 1. 运行完整发布门禁
+  console.log("📋 运行格式、Lint、类型、测试与构建检查...");
+  execSync("pnpm check", { stdio: "inherit" });
 
-  // 2. 代码检查
-  console.log("🔍 代码检查...");
-  execSync("npm run lint:check", { stdio: "inherit" });
+  // 2. 检查发布包内容
+  console.log("🔍 检查 npm 包内容...");
+  execSync("npm pack --dry-run", { stdio: "inherit" });
 
-  // 3. 类型检查
-  console.log("📝 类型检查...");
-  execSync("npm run type-check", { stdio: "inherit" });
-
-  // 4. 构建
-  console.log("🏗️ 构建项目...");
-  execSync("npm run build:lib", { stdio: "inherit" });
-
-  // 5. 发布到 npm
+  // 3. 发布到 npm
   console.log("📦 发布到 npm...");
-  execSync("npm publish", { stdio: "inherit" });
+  execSync("npm publish --access public", { stdio: "inherit" });
 
   console.log("✅ 发布成功！");
   console.log(`📦 版本: ${version}`);

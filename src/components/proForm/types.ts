@@ -14,62 +14,62 @@ export type ProFormFieldType =
   | "switch"
   | "upload"
   | "image"
-  | "custom"
+  | "custom";
 
 // 表单项配置
 export interface ProFormFieldProps {
   /** 字段名 */
-  name: string
+  name: string;
   /** 标签 */
-  label: string
+  label: string;
   /** 字段类型 */
-  type?: ProFormFieldType
+  type?: ProFormFieldType;
   /** 占位符 */
-  placeholder?: string
+  placeholder?: string;
   /** 是否必填 */
-  required?: boolean
+  required?: boolean;
   /** 验证规则 */
-  rules?: any[]
+  rules?: any[];
   /** 字段宽度 */
-  width?: string | number
+  width?: string | number;
   /** 是否禁用 */
-  disabled?: boolean
+  disabled?: boolean;
   /** 是否只读 */
-  readonly?: boolean
+  readonly?: boolean;
   /** 是否隐藏 */
-  hidden?: boolean
+  hidden?: boolean;
   /** 自定义渲染 */
-  render?: (formData: any, isDetail: boolean) => any
+  render?: (formData: any, isDetail: boolean) => any;
   /** 字段属性 */
-  fieldProps?: Record<string, any>
+  fieldProps?: Record<string, any>;
   /** 选择器选项 */
-  options?: Array<{ label: string; value: any; disabled?: boolean }>
+  options?: Array<{ label: string; value: any; disabled?: boolean }>;
   /** 枚举值 */
-  valueEnum?: Record<string | number, string | { label: string; value: any }>
+  valueEnum?: Record<string | number, string | { label: string; value: any }>;
   /** 依赖字段 */
-  dependencies?: string[]
+  dependencies?: string[];
   /** 依赖字段变化时的处理 */
-  onDependencyChange?: (value: any, formData: any) => void
+  onDependencyChange?: (value: any, formData: any) => void;
 }
 
 // ProForm 配置
 export interface ProFormConfig {
   /** 表单数据 */
-  modelValue: Record<string, any>
+  modelValue: Record<string, any>;
   /** 验证规则 */
-  rules?: Record<string, any[]>
+  rules?: Record<string, any[]>;
   /** 标签宽度 */
-  labelWidth?: string
+  labelWidth?: string;
   /** 是否禁用 */
-  disabled?: boolean
+  disabled?: boolean;
   /** 是否只读 */
-  readonly?: boolean
+  readonly?: boolean;
   /** 字段配置 */
-  fields: ProFormFieldProps[]
+  fields: ProFormFieldProps[];
   /** 提交函数 */
-  onSubmit?: (values: any) => Promise<void> | void
+  onSubmit?: (values: any) => Promise<void> | void;
   /** 重置函数 */
-  onReset?: () => void
+  onReset?: () => void;
   /** 字段值变化 */
-  onValuesChange?: (changedValues: any, allValues: any) => void
+  onValuesChange?: (changedValues: any, allValues: any) => void;
 }

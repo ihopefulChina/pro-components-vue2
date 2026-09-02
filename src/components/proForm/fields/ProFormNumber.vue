@@ -1,7 +1,14 @@
 <template>
-  <ProFormItem :name="name" :label="label" :span="span" :required="required" :rules="rules" :tooltip="tooltip">
+  <ProFormItem
+    :name="name"
+    :label="label"
+    :span="span"
+    :required="required"
+    :rules="rules"
+    :tooltip="tooltip"
+  >
     <el-input-number
-      v-model="value"
+      v-model="numberValue"
       :placeholder="placeholder"
       :disabled="disabled"
       :readonly="readonly"
@@ -16,88 +23,88 @@
 </template>
 
 <script lang="ts">
-import { defineComponent, computed } from "@vue/composition-api"
-import ProFormItem from "../ProFormItem.vue"
+import { defineComponent, computed } from "@vue/composition-api";
+import ProFormItem from "../ProFormItem.vue";
 
 export default defineComponent({
   name: "ProFormNumber",
-  inheritAttrs: false,
   components: { ProFormItem },
+  inheritAttrs: false,
   props: {
     // 表单项属性
     name: {
       type: String,
-      required: true
+      required: true,
     },
     label: {
       type: String,
-      required: true
+      required: true,
     },
     span: {
       type: Number,
-      default: 24
+      default: 24,
     },
     required: {
       type: Boolean,
-      default: false
+      default: false,
     },
     rules: {
       type: Array,
-      default: () => []
+      default: () => [],
     },
     // 提示信息
     tooltip: {
       type: String,
-      default: ""
+      default: "",
     },
     // 数字输入框属性
     value: {
       type: [String, Number],
-      default: undefined
+      default: undefined,
     },
     placeholder: {
       type: String,
-      default: "请输入数字"
+      default: "请输入数字",
     },
     disabled: {
       type: Boolean,
-      default: false
+      default: false,
     },
     readonly: {
       type: Boolean,
-      default: false
+      default: false,
     },
     min: {
       type: Number,
-      default: undefined
+      default: undefined,
     },
     max: {
       type: Number,
-      default: undefined
+      default: undefined,
     },
     step: {
       type: Number,
-      default: 1
+      default: 1,
     },
     precision: {
       type: Number,
-      default: undefined
+      default: undefined,
     },
     controls: {
       type: Boolean,
-      default: true
-    }
+      default: true,
+    },
   },
   emits: ["input"],
   setup(props, { emit }) {
     const numberValue = computed({
       get: () => props.value,
-      set: val => emit("input", val)
-    })
+      set: val => emit("input", val),
+    });
 
     return {
-      value: numberValue
-    }
-  }
-})
+      numberValue,
+    };
+  },
+});
 </script>

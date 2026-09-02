@@ -2,31 +2,54 @@
   "name": "pro-components-vue2",
   "version": "1.0.0",
   "description": "基于Vue2+element-ui+Composition API+TypeScript的高质量组件库",
-  "main": "dist/index.js",
-  "module": "dist/index.esm.js",
+  "main": "dist/index.umd.js",
+  "module": "dist/index.mjs",
   "types": "dist/index.d.ts",
+  "style": "dist/index.css",
+  "sideEffects": [
+    "**/*.css",
+    "**/*.scss"
+  ],
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.mjs",
+      "require": "./dist/index.umd.js"
+    },
+    "./style.css": "./dist/index.css",
+    "./index.css": "./dist/index.css"
+  },
   "files": [
     "dist",
+    "assets",
     "README.md",
     "LICENSE"
   ],
   "scripts": {
-    "dev": "vite --config vite.config.dev.ts",
+    "dev": "vite --config vite.config.dev.mts",
+    "dev:docs": "pnpm --dir docs dev",
     "start": "node start-dev.js",
     "build": "vite build",
     "build:lib": "vite build --mode lib",
+    "build:docs": "pnpm build:lib && pnpm --dir docs build",
+    "check": "pnpm lint:check && pnpm format:check && pnpm type-check && pnpm test && pnpm build:docs",
     "preview": "vite preview",
     "lint": "eslint src --ext .vue,.js,.ts --fix",
     "lint:check": "eslint src --ext .vue,.js,.ts",
-    "format": "prettier --write \"src/**/*.{js,ts,vue,json,css,scss,md}\"",
-    "format:check": "prettier --check \"src/**/*.{js,ts,vue,json,css,scss,md}\"",
+    "format": "prettier --write \"src/**/*.{js,ts,vue,json,css,scss,md}\" \"docs/src/**/*.{ts,vue,scss}\" \"docs/*.{ts,mts,json,html}\" \"*.{md,mts}\"",
+    "format:check": "prettier --check \"src/**/*.{js,ts,vue,json,css,scss,md}\" \"docs/src/**/*.{ts,vue,scss}\" \"docs/*.{ts,mts,json,html}\" \"*.{md,mts}\"",
     "type-check": "vue-tsc --noEmit",
-    "test": "vitest",
+    "test": "vitest run",
+    "test:watch": "vitest",
     "test:ui": "vitest --ui",
-    "test:coverage": "vitest --coverage",
-    "prepublishOnly": "npm run build:lib && npm run lint:check && npm run type-check",
-    "release": "npm run build:lib && npm publish"
+    "test:coverage": "vitest run --coverage",
+    "prepublishOnly": "pnpm lint:check && pnpm format:check && pnpm type-check && pnpm test && pnpm build:lib",
+    "release": "node scripts/release.js"
   },
+  "engines": {
+    "node": ">=18"
+  },
+  "packageManager": "pnpm@10.34.5",
   "keywords": [
     "vue2",
     "composition-api",
@@ -40,43 +63,43 @@
   "license": "MIT",
   "repository": {
     "type": "git",
-    "url": "https://github.com/ihopefulChina/pro-components-vue2.git"
+    "url": "git+https://github.com/ihopefulChina/pro-components-vue2.git"
   },
   "bugs": {
     "url": "https://github.com/ihopefulChina/pro-components-vue2/issues"
   },
-  "homepage": "https://github.com/ihopefulChina/pro-components-vue2#readme",
+  "homepage": "https://ihopefulchina.github.io/pro-components-vue2/",
   "peerDependencies": {
     "@vue/composition-api": "^1.7.0",
     "element-ui": "^2.15.0",
-    "vue": "^2.6.0"
+    "vue": ">=2.6.14 <2.7.0"
   },
   "devDependencies": {
-    "@types/node": "^20.0.0",
-    "@typescript-eslint/eslint-plugin": "^6.0.0",
-    "@typescript-eslint/parser": "^6.0.0",
-    "@vitejs/plugin-vue2": "^2.0.3",
-    "@vue/composition-api": "^1.7.0",
+    "@types/node": "^18.19.130",
+    "@typescript-eslint/eslint-plugin": "^6.21.0",
+    "@typescript-eslint/parser": "^6.21.0",
+    "@vitest/coverage-v8": "3.2.6",
+    "@vitest/ui": "3.2.6",
+    "@vue/composition-api": "^1.7.2",
     "@vue/eslint-config-typescript": "^12.0.0",
-    "@vue/test-utils": "^1.3.0",
-    "@types/jest": "^29.0.0",
-    "element-ui": "^2.15.0",
-    "eslint": "^8.0.0",
-    "eslint-plugin-vue": "^9.0.0",
-    "jsdom": "^27.0.0",
-    "prettier": "^3.0.0",
-    "sass": "^1.60.0",
-    "typescript": "^5.0.0",
-    "vite": "^4.4.0",
-    "vite-plugin-dts": "^3.0.0",
-    "vite-plugin-lib-inject-css": "^1.3.0",
-    "vitest": "^0.34.0",
-    "vue": "^2.7.0",
-    "vue-tsc": "^1.8.0"
+    "@vue/test-utils": "^1.3.6",
+    "baseline-browser-mapping": "2.11.20",
+    "element-ui": "^2.15.14",
+    "eslint": "^8.57.1",
+    "eslint-plugin-vue": "^9.33.0",
+    "jsdom": "26.1.0",
+    "prettier": "^3.9.6",
+    "sass": "1.77.8",
+    "typescript": "5.2.2",
+    "vite": "6.4.3",
+    "vite-plugin-dts": "4.5.4",
+    "vite-plugin-vue2": "^2.0.3",
+    "vitest": "3.2.6",
+    "vue": "2.6.14",
+    "vue-template-compiler": "2.6.14",
+    "vue-tsc": "^1.8.27"
   },
   "dependencies": {
-    "lodash-es": "^4.17.0",
-    "vite-plugin-vue2": "^2.0.3",
     "vuedraggable": "^2.24.3"
   }
 }

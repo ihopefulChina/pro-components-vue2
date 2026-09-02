@@ -1,7 +1,27 @@
 <template>
-  <ProFormItem :name="name" :label="label" :span="span" :required="required" :rules="rules" :tooltip="tooltip">
-    <el-radio-group v-model="radioValue" :disabled="disabled" :size="size" :text-color="textColor" :fill="fill" v-bind="$attrs">
-      <el-radio v-for="option in options" :key="option.value" :label="option.value" :disabled="option.disabled" :border="border">
+  <ProFormItem
+    :name="name"
+    :label="label"
+    :span="span"
+    :required="required"
+    :rules="rules"
+    :tooltip="tooltip"
+  >
+    <el-radio-group
+      v-model="radioValue"
+      :disabled="disabled"
+      :size="size"
+      :text-color="textColor"
+      :fill="fill"
+      v-bind="$attrs"
+    >
+      <el-radio
+        v-for="option in options"
+        :key="option.value"
+        :label="option.value"
+        :disabled="option.disabled"
+        :border="border"
+      >
         {{ option.label }}
       </el-radio>
     </el-radio-group>
@@ -9,86 +29,86 @@
 </template>
 
 <script lang="ts">
-import { defineComponent, computed, PropType } from "@vue/composition-api"
-import ProFormItem from "../ProFormItem.vue"
+import { defineComponent, computed, PropType } from "@vue/composition-api";
+import ProFormItem from "../ProFormItem.vue";
 
 interface Option {
-  label: string
-  value: any
-  disabled?: boolean
+  label: string;
+  value: any;
+  disabled?: boolean;
 }
 
 export default defineComponent({
   name: "ProFormRadio",
-  inheritAttrs: false,
   components: { ProFormItem },
+  inheritAttrs: false,
   props: {
     // 表单项属性
     name: {
       type: String,
-      required: true
+      required: true,
     },
     label: {
       type: String,
-      required: true
+      required: true,
     },
     span: {
       type: Number,
-      default: 24
+      default: 24,
     },
     required: {
       type: Boolean,
-      default: false
+      default: false,
     },
     rules: {
       type: Array,
-      default: () => []
+      default: () => [],
     },
     // 提示信息
     tooltip: {
       type: String,
-      default: ""
+      default: "",
     },
     // 单选框属性
     value: {
       type: [String, Number, Boolean],
-      default: undefined
+      default: undefined,
     },
     disabled: {
       type: Boolean,
-      default: false
+      default: false,
     },
     options: {
       type: Array as PropType<Option[]>,
-      default: () => []
+      default: () => [],
     },
     size: {
       type: String,
-      default: "medium"
+      default: "medium",
     },
     textColor: {
       type: String,
-      default: "#409EFF"
+      default: "#409EFF",
     },
     fill: {
       type: String,
-      default: "#409EFF"
+      default: "#409EFF",
     },
     border: {
       type: Boolean,
-      default: false
-    }
+      default: false,
+    },
   },
   emits: ["input"],
   setup(props, { emit }) {
     const radioValue = computed({
       get: () => props.value,
-      set: val => emit("input", val)
-    })
+      set: val => emit("input", val),
+    });
 
     return {
-      radioValue
-    }
-  }
-})
+      radioValue,
+    };
+  },
+});
 </script>

@@ -13,7 +13,7 @@
   <PageContainer>
     <ProTable :columns="columns" :request="request">
       <template #toolBar>
-        <el-button type="primary" @click="onAdd"> 新增 </el-button>
+        <el-button type="primary" @click="onAdd">新增</el-button>
       </template>
     </ProTable>
 
@@ -46,7 +46,7 @@ export default defineComponent({
 
     /** 表格请求 hooks */
     const { request, onRefresh } = useProTableRequest(queryList, {
-      paramsFormat: (params) => ({ ...params }),
+      paramsFormat: params => ({ ...params }),
     });
 
     /** 编辑新增 hooks */
@@ -121,7 +121,7 @@ export default defineComponent({
 
     /** 合并列配置 */
     const columns: ICommonTableColumn[] = [
-      ...tableColumns.map((item) => ({ ...item, hideInSearch: true })),
+      ...tableColumns.map(item => ({ ...item, hideInSearch: true })),
     ];
 
     return {
@@ -190,10 +190,10 @@ export default defineComponent({
   <DrawerForm
     :title="title"
     :open="open"
-    :isDetail="isDetail"
-    :initialValue="initialValue"
-    @onSubmit="handleSubmit"
-    @onClose="handleClose"
+    :is-detail="isDetail"
+    :initial-value="initialValue"
+    :submitter="handleSubmit"
+    @close="handleClose"
   >
     <template #default="{ formData, isDetail }">
       <!-- 字段名称 -->
@@ -455,10 +455,7 @@ export const submitForm = (data: ItemDTO): Promise<ApiResponse> => {
 };
 
 // 更新数据
-export const updateItem = (
-  id: number,
-  data: Partial<ItemDTO>
-): Promise<ApiResponse> => {
+export const updateItem = (id: number, data: Partial<ItemDTO>): Promise<ApiResponse> => {
   return http.put(`/api/path/${id}`, data);
 };
 
@@ -499,7 +496,7 @@ const { mutate: submitForm } = useMutate(apiFunction, {
 
 // 表格请求
 const { request, onRefresh } = useProTableRequest(queryApi, {
-  paramsFormat: (params) => ({ ...params }),
+  paramsFormat: params => ({ ...params }),
 });
 
 // 抽屉表单

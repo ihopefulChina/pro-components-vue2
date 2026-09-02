@@ -32,7 +32,7 @@
 </template>
 
 <script lang="ts">
-import { defineComponent, computed, PropType } from "vue";
+import { computed, defineComponent, PropType } from "@vue/composition-api";
 import ProFormItem from "../ProFormItem.vue";
 
 interface Option {
@@ -43,8 +43,8 @@ interface Option {
 
 export default defineComponent({
   name: "ProFormCheckbox",
-  inheritAttrs: false,
   components: { ProFormItem },
+  inheritAttrs: false,
   props: {
     // 表单项属性
     name: {

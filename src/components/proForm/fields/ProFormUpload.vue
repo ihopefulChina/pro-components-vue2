@@ -1,7 +1,13 @@
 <template>
-  <ProFormItem :name="name" :label="label" :span="span" :required="required" :rules="rules" :tooltip="tooltip">
+  <ProFormItem
+    :name="name"
+    :label="label"
+    :span="span"
+    :required="required"
+    :rules="rules"
+    :tooltip="tooltip"
+  >
     <el-upload
-      v-model="uploadValue"
       :action="action"
       :headers="headers"
       :multiple="multiple"
@@ -21,7 +27,7 @@
       :before-remove="beforeRemove"
       :list-type="listType"
       :auto-upload="autoUpload"
-      :file-list="fileList"
+      :file-list="displayFileList"
       :http-request="httpRequest"
       :disabled="disabled"
       :limit="limit"
@@ -29,121 +35,123 @@
       v-bind="$attrs"
     >
       <slot>
-        <el-button size="small" type="primary" v-if="!drag">点击上传</el-button>
+        <el-button v-if="!drag" size="small" type="primary">点击上传</el-button>
         <div v-else>
-          <i class="el-icon-upload"></i>
+          <i class="el-icon-upload" />
           <div class="el-upload__text">
             将文件拖到此处，或
             <em>点击上传</em>
           </div>
         </div>
       </slot>
-      <template #tip v-if="tip">
-        <div class="el-upload__tip">{{ tip }}</div>
+      <template v-if="tip" #tip>
+        <div class="el-upload__tip">
+          {{ tip }}
+        </div>
       </template>
     </el-upload>
   </ProFormItem>
 </template>
 
 <script lang="ts">
-import { defineComponent, computed } from "@vue/composition-api"
-import ProFormItem from "../ProFormItem.vue"
+import { computed, defineComponent } from "@vue/composition-api";
+import ProFormItem from "../ProFormItem.vue";
 
 export default defineComponent({
   name: "ProFormUpload",
-  inheritAttrs: false,
   components: { ProFormItem },
+  inheritAttrs: false,
   props: {
     // 表单项属性
     name: {
       type: String,
-      required: true
+      required: true,
     },
     label: {
       type: String,
-      required: true
+      required: true,
     },
     span: {
       type: Number,
-      default: 24
+      default: 24,
     },
     required: {
       type: Boolean,
-      default: false
+      default: false,
     },
     rules: {
       type: Array,
-      default: () => []
+      default: () => [],
     },
     // 提示信息
     tooltip: {
       type: String,
-      default: ""
+      default: "",
     },
     // 上传属性
     value: {
       type: [String, Array],
-      default: ""
+      default: "",
     },
     action: {
       type: String,
-      required: true
+      default: "",
     },
     headers: {
       type: Object,
-      default: () => ({})
+      default: () => ({}),
     },
     multiple: {
       type: Boolean,
-      default: false
+      default: false,
     },
     data: {
       type: Object,
-      default: () => ({})
+      default: () => ({}),
     },
     uploadName: {
       type: String,
-      default: "file"
+      default: "file",
     },
     withCredentials: {
       type: Boolean,
-      default: false
+      default: false,
     },
     showFileList: {
       type: Boolean,
-      default: true
+      default: true,
     },
     drag: {
       type: Boolean,
-      default: false
+      default: false,
     },
     accept: {
       type: String,
-      default: ""
+      default: "",
     },
     listType: {
       type: String,
-      default: "text"
+      default: "text",
     },
     autoUpload: {
       type: Boolean,
-      default: true
+      default: true,
     },
     fileList: {
       type: Array,
-      default: () => []
+      default: () => [],
     },
     disabled: {
       type: Boolean,
-      default: false
+      default: false,
     },
     limit: {
       type: Number,
-      default: undefined
+      default: undefined,
     },
     tip: {
       type: String,
-      default: ""
+      default: "",
     },
     // 事件处理函数
     onPreview: Function,
@@ -155,60 +163,67 @@ export default defineComponent({
     beforeUpload: Function,
     beforeRemove: Function,
     httpRequest: Function,
-    onExceed: Function
+    onExceed: Function,
   },
   emits: ["input", "preview", "remove", "success", "error", "progress", "change", "exceed"],
   setup(props, { emit }) {
-    const uploadValue = computed({
-      get: () => props.value,
-      set: val => emit("input", val)
-    })
+    const displayFileList = computed(() => {
+      if (props.fileList.length > 0) return props.fileList;
+      return Array.isArray(props.value) ? props.value : [];
+    });
+
+    const syncFileList = (fileList: unknown[]) => {
+      emit("input", fileList);
+    };
 
     const handlePreview = (file: any) => {
-      emit("preview", file)
-      props.onPreview?.(file)
-    }
+      emit("preview", file);
+      props.onPreview?.(file);
+    };
 
     const handleRemove = (file: any, fileList: any[]) => {
-      emit("remove", file, fileList)
-      props.onRemove?.(file, fileList)
-    }
+      syncFileList(fileList);
+      emit("remove", file, fileList);
+      props.onRemove?.(file, fileList);
+    };
 
     const handleSuccess = (response: any, file: any, fileList: any[]) => {
-      emit("success", response, file, fileList)
-      props.onSuccess?.(response, file, fileList)
-    }
+      syncFileList(fileList);
+      emit("success", response, file, fileList);
+      props.onSuccess?.(response, file, fileList);
+    };
 
     const handleError = (err: any, file: any, fileList: any[]) => {
-      emit("error", err, file, fileList)
-      props.onError?.(err, file, fileList)
-    }
+      emit("error", err, file, fileList);
+      props.onError?.(err, file, fileList);
+    };
 
     const handleProgress = (event: any, file: any, fileList: any[]) => {
-      emit("progress", event, file, fileList)
-      props.onProgress?.(event, file, fileList)
-    }
+      emit("progress", event, file, fileList);
+      props.onProgress?.(event, file, fileList);
+    };
 
     const handleChange = (file: any, fileList: any[]) => {
-      emit("change", file, fileList)
-      props.onChange?.(file, fileList)
-    }
+      syncFileList(fileList);
+      emit("change", file, fileList);
+      props.onChange?.(file, fileList);
+    };
 
     const handleExceed = (files: any, fileList: any[]) => {
-      emit("exceed", files, fileList)
-      props.onExceed?.(files, fileList)
-    }
+      emit("exceed", files, fileList);
+      props.onExceed?.(files, fileList);
+    };
 
     return {
-      uploadValue,
+      displayFileList,
       handlePreview,
       handleRemove,
       handleSuccess,
       handleError,
       handleProgress,
       handleChange,
-      handleExceed
-    }
-  }
-})
+      handleExceed,
+    };
+  },
+});
 </script>

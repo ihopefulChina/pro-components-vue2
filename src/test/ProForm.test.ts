@@ -1,39 +1,57 @@
 import ProForm from "@/components/proForm/ProForm.vue";
-import VueCompositionAPI from "@vue/composition-api";
 import { createLocalVue, mount } from "@vue/test-utils";
 import ElementUI from "element-ui";
 
 const localVue = createLocalVue();
-localVue.use(VueCompositionAPI);
 localVue.use(ElementUI);
 
 describe("ProForm", () => {
-  it("renders correctly", () => {
+  it("renders and synchronizes a changed initial value", async () => {
     const wrapper = mount(ProForm, {
       localVue,
       propsData: {
-        initialValue: {},
+        initialValue: { name: "first" },
         rules: {},
       },
     });
 
     expect(wrapper.exists()).toBe(true);
+    expect(wrapper.vm.getFieldsValue()).toEqual({ name: "first" });
+
+    await wrapper.setProps({ initialValue: { name: "second" } });
+    await wrapper.vm.$nextTick();
+
+    expect(wrapper.vm.getFieldsValue()).toEqual({ name: "second" });
   });
 
-  it("emits submit event", async () => {
+  it("awaits the submitter and blocks duplicate submits", async () => {
+    let resolveSubmit!: () => void;
+    const submitter = vi.fn(
+      () =>
+        new Promise<void>(resolve => {
+          resolveSubmit = resolve;
+        })
+    );
     const wrapper = mount(ProForm, {
       localVue,
       propsData: {
         initialValue: { name: "test" },
         rules: {},
+        submitter,
       },
     });
 
-    await wrapper.vm.$nextTick();
+    const firstSubmit = wrapper.vm.submit();
+    const duplicateSubmit = await wrapper.vm.submit();
 
-    // 模拟提交
-    wrapper.vm.handleSubmit();
+    expect(duplicateSubmit).toBe(false);
+    expect(submitter).toHaveBeenCalledTimes(1);
+    expect(wrapper.vm.isSubmitting).toBe(true);
 
-    expect(wrapper.emitted().submit).toBeTruthy();
+    resolveSubmit();
+    await firstSubmit;
+
+    expect(wrapper.vm.isSubmitting).toBe(false);
+    expect(wrapper.emitted().submit?.[0]).toEqual([{ name: "test" }]);
   });
 });

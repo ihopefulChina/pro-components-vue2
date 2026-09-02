@@ -2,8 +2,8 @@
 
 ## 环境要求
 
-- Node.js >= 16.0.0
-- Vue 2.6.0+
+- Node.js >= 18.0.0
+- Vue 2.6.14（不支持 Vue 2.7）
 - @vue/composition-api 1.7.0+
 - Element UI 2.15.0+
 
@@ -20,9 +20,9 @@ yarn add pro-components-vue2
 ### 2. 安装 peer dependencies
 
 ```bash
-npm install vue@^2.6.0 @vue/composition-api@^1.7.0 element-ui@^2.15.0
+npm install vue@2.6.14 @vue/composition-api@^1.7.0 element-ui@^2.15.0
 # 或
-yarn add vue@^2.6.0 @vue/composition-api@^1.7.0 element-ui@^2.15.0
+yarn add vue@2.6.14 @vue/composition-api@^1.7.0 element-ui@^2.15.0
 ```
 
 ### 3. 在项目中使用
@@ -33,15 +33,16 @@ yarn add vue@^2.6.0 @vue/composition-api@^1.7.0 element-ui@^2.15.0
 // main.js
 import Vue from "vue";
 import ElementUI from "element-ui";
-import "@vue/composition-api";
+import VueCompositionAPI from "@vue/composition-api";
 import ProComponentsVue2 from "pro-components-vue2";
 import "element-ui/lib/theme-chalk/index.css";
 
+Vue.use(VueCompositionAPI);
 Vue.use(ElementUI);
 Vue.use(ProComponentsVue2);
 
 new Vue({
-  render: (h) => h(App),
+  render: h => h(App),
 }).$mount("#app");
 ```
 
@@ -78,19 +79,19 @@ cd pro-components-vue2
 ### 2. 安装依赖
 
 ```bash
-npm install
+pnpm install --frozen-lockfile
 ```
 
 ### 3. 启动开发服务器
 
 ```bash
-npm run dev
+pnpm dev
 ```
 
 ### 4. 构建项目
 
 ```bash
-npm run build:lib
+pnpm build:lib
 ```
 
 ## 常见问题
@@ -116,7 +117,9 @@ import "element-ui/lib/theme-chalk/index.css";
 A: 确保在 Vue 实例创建之前安装了 @vue/composition-api：
 
 ```javascript
-import "@vue/composition-api";
+import VueCompositionAPI from "@vue/composition-api";
+
+Vue.use(VueCompositionAPI);
 ```
 
 ## 技术支持

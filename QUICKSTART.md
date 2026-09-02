@@ -27,15 +27,16 @@ npm install @vue/composition-api element-ui
 // main.js
 import Vue from "vue";
 import ElementUI from "element-ui";
-import "@vue/composition-api";
+import VueCompositionAPI from "@vue/composition-api";
 import ProComponentsVue2 from "pro-components-vue2";
 import "element-ui/lib/theme-chalk/index.css";
 
+Vue.use(VueCompositionAPI);
 Vue.use(ElementUI);
 Vue.use(ProComponentsVue2);
 
 new Vue({
-  render: (h) => h(App),
+  render: h => h(App),
 }).$mount("#app");
 ```
 
@@ -45,20 +46,27 @@ new Vue({
 <template>
   <div>
     <!-- 基础表单 -->
-    <ProForm :initial-value="formData" :rules="rules" @submit="handleSubmit">
-      <ProFormText name="username" label="用户名" :required="true" />
-      <ProFormSelect name="role" label="角色" :options="roleOptions" />
+    <ProForm
+      v-slot="{ formData }"
+      :initial-value="initialValue"
+      :rules="rules"
+      :submitter="handleSubmit"
+    >
+      <ProFormText v-model="formData.username" name="username" label="用户名" required />
+      <ProFormSelect v-model="formData.role" name="role" label="角色" :options="roleOptions" />
     </ProForm>
 
     <!-- 弹窗表单 -->
     <el-button @click="showModal = true">打开弹窗</el-button>
     <ModalForm
-      :visible="showModal"
+      :open="showModal"
       title="用户信息"
-      @submit="handleModalSubmit"
-      @cancel="showModal = false"
+      :submitter="handleModalSubmit"
+      @close="showModal = false"
     >
-      <ProFormText name="name" label="姓名" />
+      <template #default="{ formData }">
+        <ProFormText v-model="formData.name" name="name" label="姓名" />
+      </template>
     </ModalForm>
   </div>
 </template>
@@ -70,7 +78,7 @@ export default {
   setup() {
     const showModal = ref(false);
 
-    const formData = reactive({
+    const initialValue = reactive({
       username: "",
       role: "",
     });
@@ -84,18 +92,18 @@ export default {
       { label: "用户", value: "user" },
     ];
 
-    const handleSubmit = (data) => {
+    const handleSubmit = data => {
       console.log("表单数据:", data);
     };
 
-    const handleModalSubmit = (data) => {
+    const handleModalSubmit = data => {
       console.log("弹窗数据:", data);
       showModal.value = false;
     };
 
     return {
       showModal,
-      formData,
+      initialValue,
       rules,
       roleOptions,
       handleSubmit,
@@ -160,7 +168,7 @@ export default {
       { label: "标签页2", value: "tab2", content: "这是第二个标签页的内容" },
     ];
 
-    const handleTabChange = (value) => {
+    const handleTabChange = value => {
       console.log("切换到:", value);
     };
 
@@ -177,6 +185,6 @@ export default {
 ## 下一步
 
 - 查看 [完整文档](./README.md)
-- 浏览 [组件示例](./examples/)
-- 了解 [API 文档](./docs/)
+- 浏览 [组件源码](./src/components/)
+- 了解 [安装指南](./INSTALLATION.md)
 - 参与 [社区讨论](https://github.com/ihopefulChina/pro-components-vue2/discussions)

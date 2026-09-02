@@ -8,9 +8,7 @@ import { FormInstance, ProFormProvide } from "../type";
 export function useValidateForm(name?: string) {
   const proFormRef = inject<ProFormProvide>("proForm");
 
-  const formRef = computed<FormInstance | undefined>(
-    () => proFormRef?.formRef?.value
-  );
+  const formRef = computed<FormInstance | undefined>(() => proFormRef?.formRef?.value);
 
   /**
    * 触发表单验证

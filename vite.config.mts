@@ -1,7 +1,6 @@
 import { resolve } from "path";
 import { defineConfig } from "vite";
 import dts from "vite-plugin-dts";
-import { libInjectCss } from "vite-plugin-lib-inject-css";
 import { createVuePlugin } from "vite-plugin-vue2";
 
 export default defineConfig({
@@ -14,9 +13,9 @@ export default defineConfig({
     }),
     dts({
       include: ["src/**/*"],
-      exclude: ["src/**/*.test.ts", "src/**/*.spec.ts"],
+      exclude: ["src/test/**/*", "src/**/*.test.ts", "src/**/*.spec.ts"],
+      copyDtsFiles: true,
     }),
-    libInjectCss(),
   ],
   resolve: {
     alias: {
@@ -32,12 +31,14 @@ export default defineConfig({
     lib: {
       entry: resolve(__dirname, "src/index.ts"),
       name: "ProComponentsVue2",
-      fileName: format => `index.${format}.js`,
+      cssFileName: "index",
+      fileName: format => (format === "es" ? "index.mjs" : "index.umd.js"),
       formats: ["es", "umd"],
     },
     rollupOptions: {
       external: ["vue", "@vue/composition-api", "element-ui"],
       output: {
+        exports: "named",
         globals: {
           vue: "Vue",
           "@vue/composition-api": "VueCompositionAPI",

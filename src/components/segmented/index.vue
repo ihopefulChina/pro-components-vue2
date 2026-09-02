@@ -2,46 +2,78 @@
   <div class="segmented-wrapper">
     <!-- Segmented 头部 -->
     <div class="segmented-header">
-      <div class="segmented-control">
-        <draggable v-model="internalItems" class="segmented-draggable" handle=".segmented-item" :disabled="disabled" @end="handleDragEnd">
+      <div class="segmented-control" role="tablist" :aria-label="label || '分段选项'">
+        <draggable
+          v-model="internalItems"
+          class="segmented-draggable"
+          handle=".segmented-item"
+          :disabled="disabled"
+          @end="handleDragEnd"
+        >
           <div
             v-for="(item, index) in internalItems"
             :key="item.id || index"
             class="segmented-item"
             :class="{ active: activeIndex === index, disabled: disabled }"
+            role="tab"
+            :aria-selected="activeIndex === index ? 'true' : 'false'"
+            :aria-disabled="disabled ? 'true' : 'false'"
+            :tabindex="activeIndex === index && !disabled ? 0 : -1"
             @click.stop="handleItemClick(index)"
+            @keydown="handleItemKeydown($event, index)"
           >
             <slot name="label" :item="item" :index="index">
               {{ itemLabel ? itemLabel(item, index) : `${label} ${index + 1}` }}
             </slot>
-            <i
-              class="el-icon-circle-close delete-btn-mini"
+            <button
               v-if="showDelete && !disabled && internalItems.length > minItems"
+              type="button"
+              class="delete-btn-mini"
+              :aria-label="`删除第 ${index + 1} 项`"
               @click.stop="handleRemove(index)"
-            />
+            >
+              <i class="el-icon-circle-close" aria-hidden="true" />
+            </button>
           </div>
         </draggable>
-        <div v-if="showAdd && !disabled && (!maxItems || internalItems.length < maxItems)" class="segmented-item add-item" @click="handleAdd">
-          <i :class="addIcon"></i>
+        <button
+          v-if="showAdd && !disabled && (!maxItems || internalItems.length < maxItems)"
+          type="button"
+          class="segmented-item add-item"
+          @click="handleAdd"
+        >
+          <i :class="addIcon" aria-hidden="true" />
           {{ addText }}
-        </div>
+        </button>
       </div>
     </div>
 
     <!-- Segmented 内容 -->
-    <template v-for="(item, index) in internalItems">
-      <div v-show="activeIndex === index" :key="item.id || index" class="segmented-content">
-        <!-- 删除按钮 -->
-        <div v-if="showDelete && !disabled && internalItems.length > minItems" class="delete-btn">
-          <el-button class="delete-btn-custom" type="danger" size="mini" icon="el-icon-delete" @click="handleRemove(index)"></el-button>
-        </div>
-
-        <!-- 内容插槽 -->
-        <div class="segmented-content-body">
-          <slot :item="item" :index="index"></slot>
-        </div>
+    <div
+      v-for="(item, index) in internalItems"
+      v-show="activeIndex === index"
+      :key="item.id || index"
+      class="segmented-content"
+      role="tabpanel"
+      tabindex="0"
+    >
+      <!-- 删除按钮 -->
+      <div v-if="showDelete && !disabled && internalItems.length > minItems" class="delete-btn">
+        <el-button
+          class="delete-btn-custom"
+          type="danger"
+          size="mini"
+          icon="el-icon-delete"
+          :aria-label="`删除第 ${index + 1} 项`"
+          @click="handleRemove(index)"
+        />
       </div>
-    </template>
+
+      <!-- 内容插槽 -->
+      <div class="segmented-content-body">
+        <slot :item="item" :index="index" />
+      </div>
+    </div>
 
     <!-- 空状态 -->
     <div v-if="internalItems.length === 0" class="segmented-empty">
@@ -53,13 +85,13 @@
 </template>
 
 <script lang="ts">
-import { defineComponent, watch, computed, PropType } from "@vue/composition-api"
-import draggable from "vuedraggable"
-import { useState } from "@/hooks/useState"
+import { computed, defineComponent, nextTick, PropType, watch } from "@vue/composition-api";
+import draggable from "vuedraggable";
+import { useState } from "@/hooks/useState";
 
 interface IItem {
-  id?: string
-  [key: string]: any
+  id?: string;
+  [key: string]: any;
 }
 
 export default defineComponent({
@@ -69,69 +101,76 @@ export default defineComponent({
     /** 数据列表 */
     value: {
       type: Array as PropType<IItem[]>,
-      default: () => []
+      default: () => [],
     },
     /** 标签名称 */
     label: {
       type: String,
-      default: ""
+      default: "",
     },
     /** 自定义标签函数 */
     itemLabel: {
       type: Function,
-      default: undefined
+      default: undefined,
     },
     /** 是否禁用 */
     disabled: {
       type: Boolean,
-      default: false
+      default: false,
     },
     /** 最小项数 */
     minItems: {
       type: Number,
-      default: 0
+      default: 0,
     },
     /** 最大项数 */
     maxItems: {
       type: Number,
-      default: undefined
+      default: undefined,
     },
     /** 是否显示添加按钮 */
     showAdd: {
       type: Boolean,
-      default: true
+      default: true,
     },
     /** 添加按钮文本 */
     addText: {
       type: String,
-      default: "添加"
+      default: "添加",
     },
     /** 添加按钮图标 */
     addIcon: {
       type: String,
-      default: "el-icon-plus"
+      default: "el-icon-plus",
     },
     /** 是否显示删除按钮 */
     showDelete: {
       type: Boolean,
-      default: true
+      default: true,
     },
     /** 默认激活索引 */
     defaultActiveIndex: {
       type: Number,
-      default: 0
-    }
+      default: 0,
+    },
   },
   emits: ["input", "change", "add", "remove", "move"],
   setup(props, { emit }) {
     /** 内部数据 */
     const internalItems = computed({
       get: () => props.value || [],
-      set: val => emit("input", val)
-    })
+      set: val => {
+        emit("input", val);
+        emit("change", val);
+      },
+    });
 
     /** 当前激活索引 */
-    const [activeIndex, setActiveIndex] = useState<number | undefined>(props.defaultActiveIndex)
+    const initialActiveIndex =
+      props.value.length > 0
+        ? Math.min(Math.max(props.defaultActiveIndex, 0), props.value.length - 1)
+        : 0;
+    const [activeIndex, setActiveIndex] = useState<number | undefined>(initialActiveIndex);
 
     /** 监听列表变化，调整激活索引 */
     watch(
@@ -139,62 +178,90 @@ export default defineComponent({
       newLength => {
         // 如果当前激活索引超出范围，调整到最后一个
         if (activeIndex.value !== undefined && activeIndex.value >= newLength && newLength > 0) {
-          setActiveIndex(newLength - 1)
+          setActiveIndex(newLength - 1);
         }
 
         // 如果列表为空，重置为 0
         if (newLength === 0) {
-          setActiveIndex(0)
+          setActiveIndex(0);
         }
       }
-    )
+    );
 
     /** 点击项 */
     const handleItemClick = (index: number) => {
-      if (props.disabled) return
-      setActiveIndex(index)
-    }
+      if (props.disabled) return;
+      setActiveIndex(index);
+    };
+
+    const handleItemKeydown = (event: KeyboardEvent, index: number) => {
+      if (props.disabled || internalItems.value.length === 0) return;
+
+      let nextIndex = index;
+      if (event.key === "ArrowRight" || event.key === "ArrowDown") {
+        nextIndex = (index + 1) % internalItems.value.length;
+      } else if (event.key === "ArrowLeft" || event.key === "ArrowUp") {
+        nextIndex = (index - 1 + internalItems.value.length) % internalItems.value.length;
+      } else if (event.key === "Home") {
+        nextIndex = 0;
+      } else if (event.key === "End") {
+        nextIndex = internalItems.value.length - 1;
+      } else {
+        return;
+      }
+
+      event.preventDefault();
+      setActiveIndex(nextIndex);
+      const tabs = (
+        event.currentTarget as HTMLElement
+      ).parentElement?.querySelectorAll<HTMLElement>("[role='tab']");
+      tabs?.[nextIndex]?.focus();
+    };
 
     /** 添加项 */
     const handleAdd = () => {
-      emit("add")
+      emit("add");
       // 添加后自动切换到最后一项
-      setTimeout(() => {
-        setActiveIndex(internalItems.value.length - 1)
-      }, 0)
-    }
+      nextTick(() => {
+        setActiveIndex(internalItems.value.length - 1);
+      });
+    };
 
     /** 删除项 */
     const handleRemove = (index: number) => {
-      emit("remove", index)
-      setActiveIndex(index => index)
-    }
+      if (activeIndex.value !== undefined && index < activeIndex.value) {
+        setActiveIndex(activeIndex.value - 1);
+      }
+      emit("remove", index);
+    };
 
     /** 拖拽结束 */
     const handleDragEnd = (event: any) => {
-      if (activeIndex.value === undefined) return
-      const { oldIndex, newIndex } = event
-      emit("move", oldIndex, newIndex)
+      if (activeIndex.value === undefined) return;
+      const { oldIndex, newIndex } = event;
+      if (oldIndex === undefined || newIndex === undefined) return;
+      emit("move", oldIndex, newIndex);
       // 如果拖拽的是当前激活项，更新激活索引
       if (activeIndex.value === oldIndex) {
-        setActiveIndex(newIndex)
+        setActiveIndex(newIndex);
       } else if (activeIndex.value > oldIndex && activeIndex.value <= newIndex) {
-        setActiveIndex(activeIndex.value - 1)
+        setActiveIndex(activeIndex.value - 1);
       } else if (activeIndex.value < oldIndex && activeIndex.value >= newIndex) {
-        setActiveIndex(activeIndex.value + 1)
+        setActiveIndex(activeIndex.value + 1);
       }
-    }
+    };
 
     return {
       internalItems,
       activeIndex,
       handleItemClick,
+      handleItemKeydown,
       handleAdd,
       handleRemove,
-      handleDragEnd
-    }
-  }
-})
+      handleDragEnd,
+    };
+  },
+});
 </script>
 
 <style lang="scss" scoped>
@@ -238,6 +305,8 @@ export default defineComponent({
   height: 36px;
   line-height: 28px;
   text-align: center;
+  border: 0;
+  font-family: inherit;
 
   &:hover:not(.disabled) {
     color: #409eff;
@@ -254,6 +323,11 @@ export default defineComponent({
   &.disabled {
     cursor: not-allowed;
     opacity: 0.6;
+  }
+
+  &:focus-visible {
+    outline: 2px solid #409eff;
+    outline-offset: 1px;
   }
 }
 
@@ -330,5 +404,9 @@ export default defineComponent({
   right: 0;
   top: 0;
   cursor: pointer;
+  border: 0;
+  background: transparent;
+  color: inherit;
+  padding: 2px;
 }
 </style>

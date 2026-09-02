@@ -1,5 +1,12 @@
 <template>
-  <ProFormItem :name="name" :label="label" :span="span" :required="required" :rules="rules" :tooltip="tooltip">
+  <ProFormItem
+    :name="name"
+    :label="label"
+    :span="span"
+    :required="required"
+    :rules="rules"
+    :tooltip="tooltip"
+  >
     <el-switch
       v-model="switchValue"
       :disabled="disabled"
@@ -15,84 +22,84 @@
 </template>
 
 <script lang="ts">
-import { defineComponent, computed } from "@vue/composition-api"
-import ProFormItem from "../ProFormItem.vue"
+import { defineComponent, computed } from "@vue/composition-api";
+import ProFormItem from "../ProFormItem.vue";
 
 export default defineComponent({
   name: "ProFormSwitch",
-  inheritAttrs: false,
   components: { ProFormItem },
+  inheritAttrs: false,
   props: {
     // 表单项属性
     name: {
       type: String,
-      required: true
+      required: true,
     },
     label: {
       type: String,
-      required: true
+      required: true,
     },
     span: {
       type: Number,
-      default: 24
+      default: 24,
     },
     required: {
       type: Boolean,
-      default: false
+      default: false,
     },
     rules: {
       type: Array,
-      default: () => []
+      default: () => [],
     },
     // 提示信息
     tooltip: {
       type: String,
-      default: ""
+      default: "",
     },
     // 开关属性
     value: {
       type: [Boolean, String, Number],
-      default: false
+      default: false,
     },
     disabled: {
       type: Boolean,
-      default: false
+      default: false,
     },
     activeText: {
       type: String,
-      default: ""
+      default: "",
     },
     inactiveText: {
       type: String,
-      default: ""
+      default: "",
     },
     activeValue: {
       type: [Boolean, String, Number],
-      default: true
+      default: true,
     },
     inactiveValue: {
       type: [Boolean, String, Number],
-      default: false
+      default: false,
     },
     activeColor: {
       type: String,
-      default: "#409EFF"
+      default: "#409EFF",
     },
     inactiveColor: {
       type: String,
-      default: "#C0CCDA"
-    }
+      default: "#C0CCDA",
+    },
   },
   emits: ["input"],
   setup(props, { emit }) {
     const switchValue = computed({
       get: () => props.value,
-      set: val => emit("input", val)
-    })
+      set: val => emit("input", val),
+    });
 
     return {
-      switchValue
-    }
-  }
-})
+      switchValue,
+    };
+  },
+});
 </script>

@@ -1,6 +1,13 @@
 <template>
   <el-col :span="span">
-    <el-form-item ref="formItemRef" :label="label" :prop="name" :rules="rules" :required="required" :style="formItemStyle">
+    <el-form-item
+      ref="formItemRef"
+      :label="label"
+      :prop="name"
+      :rules="rules"
+      :required="required"
+      :style="formItemStyle"
+    >
       <!-- 提示信息 -->
       <div v-if="tooltip" class="pro-form-item-tooltip">
         <el-tooltip :content="tooltip" placement="top" :disabled="!tooltip">
@@ -16,8 +23,8 @@
 </template>
 
 <script lang="ts">
-import { defineComponent, ref } from "@vue/composition-api"
-import { ElFormItem } from "element-ui/types/form-item"
+import { defineComponent, ref } from "@vue/composition-api";
+import type { ElFormItem } from "element-ui/types/form-item";
 
 export default defineComponent({
   name: "ProFormItem",
@@ -26,52 +33,52 @@ export default defineComponent({
     // 表单项属性
     name: {
       type: String,
-      required: true
+      required: true,
     },
     label: {
       type: String,
-      required: true
+      required: true,
     },
     span: {
       type: Number,
-      default: 24
+      default: 24,
     },
     required: {
       type: Boolean,
-      default: false
+      default: false,
     },
     rules: {
       type: Array,
-      default: () => []
+      default: () => [],
     },
     // 提示信息
     tooltip: {
       type: String,
-      default: ""
+      default: "",
     },
     formItemStyle: {
       type: Object,
-      default: () => ({})
-    }
+      default: () => ({}),
+    },
   },
   setup() {
-    const formItemRef = ref<InstanceType<typeof ElFormItem>>()
+    const formItemRef = ref<InstanceType<typeof ElFormItem>>();
 
     const resetField = () => {
-      formItemRef.value?.resetField()
-    }
+      formItemRef.value?.resetField();
+    };
 
     const clearValidate = () => {
-      formItemRef.value?.clearValidate()
-    }
+      formItemRef.value?.clearValidate();
+    };
 
     return {
       formItemRef,
       resetField,
-      clearValidate
-    }
-  }
-})
+      clearValidate,
+    };
+  },
+});
 </script>
 
 <style lang="scss" scoped>

@@ -1,5 +1,12 @@
 <template>
-  <ProFormItem :name="name" :label="label" :span="span" :required="required" :rules="rules" :tooltip="tooltip">
+  <ProFormItem
+    :name="name"
+    :label="label"
+    :span="span"
+    :required="required"
+    :rules="rules"
+    :tooltip="tooltip"
+  >
     <el-slider
       v-model="sliderValue"
       :min="min"
@@ -25,137 +32,137 @@
 </template>
 
 <script lang="ts">
-import { defineComponent, computed, PropType } from "@vue/composition-api"
-import ProFormItem from "../ProFormItem.vue"
+import { defineComponent, computed, PropType } from "@vue/composition-api";
+import ProFormItem from "../ProFormItem.vue";
 
 export default defineComponent({
   name: "ProFormSlider",
-  inheritAttrs: false,
   components: { ProFormItem },
+  inheritAttrs: false,
   props: {
     // 表单项属性
     name: {
       type: String,
-      required: true
+      required: true,
     },
     label: {
       type: String,
-      required: true
+      required: true,
     },
     span: {
       type: Number,
-      default: 24
+      default: 24,
     },
     required: {
       type: Boolean,
-      default: false
+      default: false,
     },
     rules: {
       type: Array,
-      default: () => []
+      default: () => [],
     },
     // 提示信息
     tooltip: {
       type: String,
-      default: ""
+      default: "",
     },
     // 滑块属性
     value: {
       type: [Number, Array],
-      default: 0
+      default: 0,
     },
     min: {
       type: Number,
-      default: 0
+      default: 0,
     },
     max: {
       type: Number,
-      default: 100
+      default: 100,
     },
     disabled: {
       type: Boolean,
-      default: false
+      default: false,
     },
     step: {
       type: Number,
-      default: 1
+      default: 1,
     },
     showInput: {
       type: Boolean,
-      default: false
+      default: false,
     },
     showInputControls: {
       type: Boolean,
-      default: true
+      default: true,
     },
     inputSize: {
       type: String,
-      default: "small"
+      default: "small",
     },
     showStops: {
       type: Boolean,
-      default: false
+      default: false,
     },
     showTooltip: {
       type: Boolean,
-      default: true
+      default: true,
     },
     formatTooltip: {
       type: Function as PropType<(val: number) => string>,
-      default: undefined
+      default: undefined,
     },
     range: {
       type: Boolean,
-      default: false
+      default: false,
     },
     vertical: {
       type: Boolean,
-      default: false
+      default: false,
     },
     height: {
       type: String,
-      default: ""
+      default: "",
     },
     sliderLabel: {
       type: String,
-      default: ""
+      default: "",
     },
     debounce: {
       type: Number,
-      default: 300
+      default: 300,
     },
     tooltipClass: {
       type: String,
-      default: ""
+      default: "",
     },
     showValue: {
       type: Boolean,
-      default: true
-    }
+      default: true,
+    },
   },
   emits: ["input", "change"],
   setup(props, { emit }) {
     const sliderValue = computed({
       get: () => props.value,
       set: val => {
-        emit("input", val)
-        emit("change", val)
-      }
-    })
+        emit("input", val);
+        emit("change", val);
+      },
+    });
     const valueText = computed(() => {
-      if (props?.value) {
+      if (props.value !== undefined && props.value !== null) {
         if (Array.isArray(props.value)) {
-          return `${props.value[0]}-${props.value[1]}`
+          return `${props.value[0]}-${props.value[1]}`;
         }
-        return props.value
+        return props.value;
       }
-      return undefined
-    })
+      return "";
+    });
 
     return {
       sliderValue,
-      valueText
-    }
-  }
-})
+      valueText,
+    };
+  },
+});
 </script>

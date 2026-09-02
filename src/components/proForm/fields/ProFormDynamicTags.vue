@@ -5,14 +5,14 @@
         <!-- 已添加的标签 -->
         <div class="tags-list">
           <el-tag
-            v-for="tag in listValue"
+            v-for="(tag, index) in listValue"
             :key="tag.id"
             :closable="!readonly && !disabled"
             :size="size"
-            @close="removeTag(tag.id)"
             class="dynamic-tag"
             effect="dark"
             hit
+            @close="removeTag(index)"
           >
             {{ tag.value }}
           </el-tag>
@@ -20,8 +20,8 @@
 
         <!-- 添加按钮 -->
         <div v-if="!readonly && !disabled && !showInput" class="add-button-container">
-          <el-button size="mini" :disabled="isMaxItems" @click="showInputField" class="add-button">
-            <i class="el-icon-plus"></i>
+          <el-button size="mini" :disabled="isMaxItems" class="add-button" @click="showInputField">
+            <i class="el-icon-plus" />
             {{ addButtonText }}
           </el-button>
         </div>
@@ -29,25 +29,25 @@
         <!-- 输入框 -->
         <div v-if="!readonly && !disabled && showInput" class="input-container">
           <el-input-number
-            ref="inputRef"
             v-if="inputProps.type === 'number'"
+            ref="inputRef"
             v-model="inputValue"
             v-bind="inputProps"
-            @keyup.enter="addTag"
-            @keyup.delete="handleDelete"
-            @blur="addTag"
             :controls="false"
             class="tag-input"
+            @keyup.enter.native="addTag"
+            @keyup.delete.native="handleDelete"
+            @blur="addTag"
           />
           <el-input
             v-else
             ref="inputRef"
             v-model="inputValue"
             v-bind="inputProps"
-            @keyup.enter="addTag"
-            @keyup.delete="handleDelete"
-            @blur="addTag"
             class="tag-input"
+            @keyup.enter.native="addTag"
+            @keyup.delete.native="handleDelete"
+            @blur="addTag"
           />
         </div>
 
@@ -61,23 +61,23 @@
 </template>
 
 <script lang="ts">
-import { useState } from "@/hooks/useState"
-import { guid } from "@/utils/guid"
-import { defineComponent, ref, nextTick, computed, PropType } from "@vue/composition-api"
-import { useValidateForm } from "../hooks/useValidateForm"
-import ProFormItem from "../ProFormItem.vue"
+import { useState } from "@/hooks/useState";
+import { guid } from "@/utils/guid";
+import { computed, defineComponent, nextTick, PropType, ref, watch } from "@vue/composition-api";
+import { useValidateForm } from "../hooks/useValidateForm";
+import ProFormItem from "../ProFormItem.vue";
 
 /**
  * 输入框属性接口
  */
 interface InputProps {
-  placeholder?: string
-  maxlength?: number
-  min?: number
-  max?: number
-  type?: string
-  size?: string
-  precision?: number
+  placeholder?: string;
+  maxlength?: number;
+  min?: number;
+  max?: number;
+  type?: string;
+  size?: string;
+  precision?: number;
 }
 
 /**
@@ -85,33 +85,38 @@ interface InputProps {
  */
 interface Props {
   /** 字段名称 */
-  name: string
+  name: string;
   /** 标签文本 */
-  label: string
+  label: string;
   /** 是否必填 */
-  required: boolean
+  required: boolean;
   /** 是否只读 */
-  readonly: boolean
+  readonly: boolean;
   /** 是否禁用 */
-  disabled: boolean
+  disabled: boolean;
   /** 组件尺寸 */
-  size: string
+  size: string;
   /** 添加按钮文本 */
-  addButtonText: string
+  addButtonText: string;
   /** 空值显示文本 */
-  emptyText: string
+  emptyText: string;
   /** 帮助文本 */
-  tooltip: string
+  tooltip: string;
   /** 最小标签数量 */
-  minItems: number
+  minItems: number;
   /** 最大标签数量 */
-  maxItems: number
+  maxItems: number;
   /** 验证规则 */
-  rules: any[]
+  rules: any[];
   /** 初始值 */
-  value: string[]
+  value: string[];
   /** 输入框属性 */
-  inputProps: InputProps
+  inputProps: InputProps;
+}
+
+interface TagItem {
+  id: string;
+  value: string;
 }
 
 export default defineComponent({
@@ -148,38 +153,62 @@ export default defineComponent({
     /** 输入框属性 */
     inputProps: {
       type: Object,
-      default: () => ({ placeholder: "请输入内容", maxlength: 20, type: "text", size: "medium", precision: 0 })
-    }
+      default: () => ({
+        placeholder: "请输入内容",
+        maxlength: 20,
+        type: "text",
+        size: "medium",
+        precision: 0,
+      }),
+    },
   },
   emits: ["input"],
   setup(props: Props, { emit }) {
     /** 验证表单项 */
-    const { validateField } = useValidateForm(props.name)
+    const { validateField } = useValidateForm(props.name);
 
-    const listValue = computed({
-      get: () => {
-        const propsValue = props.value || []
-        return propsValue.map((item: string) => {
-          return { id: guid(), value: item }
-        })
+    const createTagItems = (values: string[]): TagItem[] =>
+      values.map(value => ({ id: guid(), value }));
+    const tagItems = ref<TagItem[]>(createTagItems(props.value ?? []));
+
+    watch(
+      () => props.value,
+      newValue => {
+        const nextValues = newValue ?? [];
+        const currentValues = tagItems.value.map(item => item.value);
+        const isSame =
+          nextValues.length === currentValues.length &&
+          nextValues.every((value, index) => value === currentValues[index]);
+
+        if (!isSame) {
+          tagItems.value = createTagItems(nextValues);
+        }
       },
+      { deep: true }
+    );
+
+    const listValue = computed<TagItem[]>({
+      get: () => tagItems.value,
       set: val => {
-        validateField()
+        tagItems.value = val;
+        validateField();
         emit(
           "input",
           val.map(item => item.value)
-        )
-      }
-    })
+        );
+      },
+    });
 
-    const inputRef = ref<HTMLInputElement | null>(null)
+    const inputRef = ref<{ focus: () => void } | null>(null);
     /** 输入框值 */
-    const inputValue = ref<string | number | undefined>(undefined)
+    const inputValue = ref<string | number | undefined>(undefined);
     /** 是否显示输入框 */
-    const [showInput, setShowInput] = useState(false)
+    const [showInput, setShowInput] = useState(false);
 
     /** 是否达到最大数量 */
-    const isMaxItems = computed(() => props.maxItems && listValue.value && listValue.value.length >= props.maxItems)
+    const isMaxItems = computed(
+      () => props.maxItems > 0 && listValue.value.length >= props.maxItems
+    );
 
     /**
      * 获取标签类型
@@ -187,80 +216,82 @@ export default defineComponent({
      * @returns 标签类型
      */
     const getTagType = (index: number): string => {
-      const types = ["", "success", "info", "warning", "danger"]
-      return types[index % types.length]
-    }
+      const types = ["", "success", "info", "warning", "danger"];
+      return types[index % types.length];
+    };
 
     /**
      * 显示输入框
      */
     const showInputField = async () => {
-      setShowInput(true)
-      await nextTick()
-      inputRef.value?.focus()
-    }
+      setShowInput(true);
+      await nextTick();
+      inputRef.value?.focus();
+    };
 
     /** 隐藏输入框 */
     const hideInputField = () => {
-      setShowInput(false)
-      inputValue.value = undefined
-    }
+      setShowInput(false);
+      inputValue.value = undefined;
+    };
 
     /** 设置标签列表 */
     const setListValue = (list: { id: string; value: string }[]) => {
-      listValue.value = list
-    }
+      listValue.value = list;
+    };
 
     /**
      * 添加标签
      */
     const addTag = async () => {
-      const value = inputValue.value?.toString().trim()
+      const value = inputValue.value?.toString().trim();
 
-      if (!value) {
-        hideInputField()
-        return
+      if (!value || isMaxItems.value) {
+        hideInputField();
+        return;
       }
 
-      setListValue([...listValue.value, { id: guid(), value }])
+      setListValue([...listValue.value, { id: guid(), value }]);
 
-      hideInputField()
-    }
+      hideInputField();
+    };
 
     /**
      * 删除标签
-     * @param id - 标签索引
+     * @param index - 标签索引
      */
-    const removeTag = (id: string) => {
-      const newList = listValue.value?.filter(item => item.id !== id)
+    const removeTag = (index: number) => {
+      if (listValue.value.length <= props.minItems) return;
 
-      setListValue(newList)
-    }
+      const newList = listValue.value.filter((_, itemIndex) => itemIndex !== index);
+
+      setListValue(newList);
+    };
 
     /**
      * 处理删除键
      */
     const handleDelete = () => {
       if (inputValue.value === "" && listValue.value.length > 0) {
-        removeTag(listValue.value[listValue.value.length - 1].id)
+        removeTag(listValue.value.length - 1);
       }
-    }
+    };
 
     /**
      * 清空所有标签
      */
     const clearTags = () => {
-      inputValue.value = undefined
-      setShowInput(false)
-    }
+      inputValue.value = undefined;
+      setShowInput(false);
+      setListValue([]);
+    };
 
     /**
      * 重置组件状态
      */
     const reset = () => {
-      clearTags()
-      setListValue([])
-    }
+      clearTags();
+    };
 
     return {
       inputRef,
@@ -275,10 +306,10 @@ export default defineComponent({
       removeTag,
       handleDelete,
       clearTags,
-      reset
-    }
-  }
-})
+      reset,
+    };
+  },
+});
 </script>
 
 <style lang="scss" scoped>

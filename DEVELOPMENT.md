@@ -4,17 +4,13 @@
 
 ### 环境要求
 
-- Node.js >= 16.0.0
-- pnpm >= 7.0.0 (推荐) 或 npm >= 8.0.0
+- Node.js >= 18.0.0
+- pnpm 9.15.9
 
 ### 安装依赖
 
 ```bash
-# 使用 pnpm (推荐)
-pnpm install
-
-# 或使用 npm
-npm install
+pnpm install --frozen-lockfile
 ```
 
 ### 启动开发服务器
@@ -23,15 +19,6 @@ npm install
 # 启动主项目开发服务器
 pnpm dev
 
-# 启动基础示例
-cd examples/basic
-pnpm install
-pnpm dev
-
-# 运行业务示例
-cd examples/business
-pnpm install
-pnpm dev
 ```
 
 ## 🛠️ 开发工具

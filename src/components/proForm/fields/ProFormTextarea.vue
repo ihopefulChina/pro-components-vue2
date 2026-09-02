@@ -1,5 +1,12 @@
 <template>
-  <ProFormItem :name="name" :label="label" :span="span" :required="required" :rules="rules" :tooltip="tooltip">
+  <ProFormItem
+    :name="name"
+    :label="label"
+    :span="span"
+    :required="required"
+    :rules="rules"
+    :tooltip="tooltip"
+  >
     <el-input
       v-model="textareaValue"
       type="textarea"
@@ -17,93 +24,93 @@
 </template>
 
 <script lang="ts">
-import { defineComponent, computed } from "@vue/composition-api"
-import ProFormItem from "../ProFormItem.vue"
+import { defineComponent, computed } from "@vue/composition-api";
+import ProFormItem from "../ProFormItem.vue";
 
 export default defineComponent({
   name: "ProFormTextarea",
-  inheritAttrs: false,
   components: { ProFormItem },
+  inheritAttrs: false,
   props: {
     // 表单项属性
     name: {
       type: String,
-      required: true
+      required: true,
     },
     label: {
       type: String,
-      required: true
+      required: true,
     },
     span: {
       type: Number,
-      default: 24
+      default: 24,
     },
     required: {
       type: Boolean,
-      default: false
+      default: false,
     },
     rules: {
       type: Array,
-      default: () => []
+      default: () => [],
     },
     // 提示信息
     tooltip: {
       type: String,
-      default: ""
+      default: "",
     },
     // 输入框属性
     value: {
       type: [String, Number],
-      default: ""
+      default: "",
     },
     placeholder: {
       type: String,
-      default: ""
+      default: "",
     },
     disabled: {
       type: Boolean,
-      default: false
+      default: false,
     },
     readonly: {
       type: Boolean,
-      default: false
+      default: false,
     },
     maxlength: {
       type: Number,
-      default: undefined
+      default: undefined,
     },
     showWordLimit: {
       type: Boolean,
-      default: undefined
+      default: undefined,
     },
     rows: {
       type: Number,
-      default: 3
+      default: 3,
     },
     autosize: {
       type: [Boolean, Object],
-      default: false
+      default: false,
     },
     resize: {
       type: String,
-      default: "vertical"
-    }
+      default: "vertical",
+    },
   },
   emits: ["input"],
   setup(props, { emit }) {
     const textareaValue = computed({
       get: () => props.value,
-      set: val => emit("input", val)
-    })
+      set: val => emit("input", val),
+    });
 
     const computedShowWordLimit = computed(() => {
-      return props.showWordLimit !== undefined ? props.showWordLimit : !!props.maxlength
-    })
+      return props.showWordLimit !== undefined ? props.showWordLimit : !!props.maxlength;
+    });
 
     return {
       textareaValue,
-      computedShowWordLimit
-    }
-  }
-})
+      computedShowWordLimit,
+    };
+  },
+});
 </script>

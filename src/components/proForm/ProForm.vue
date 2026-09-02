@@ -8,14 +8,17 @@
       :rules="rules"
       :disabled="disabled"
       :label-position="labelPosition"
+      :label-width="labelWidth"
     >
       <el-row :gutter="8">
-        <slot :form-data="formData" :is-detail="readonly"></slot>
+        <slot :form-data="formData" :is-detail="readonly" />
       </el-row>
     </el-form>
 
-    <div v-if="showFooter && !readonly" :class="['pro-form-footer', { 'in-drawer': inDrawer }]">
-      <el-button @click="handleCancel">{{ cancelText }}</el-button>
+    <div v-if="showFooter && !readonly" class="pro-form-footer" :class="{ 'in-drawer': inDrawer }">
+      <el-button @click="handleCancel">
+        {{ cancelText }}
+      </el-button>
       <el-button type="primary" :loading="isSubmitting" @click="triggerSubmit">
         {{ confirmText }}
       </el-button>
@@ -24,10 +27,10 @@
 </template>
 
 <script lang="ts">
-import { useMessage } from "@/hooks/useMessage"
-import { useState } from "@/hooks/useState"
-import { defineComponent, provide, ref, watch } from "@vue/composition-api"
-import { FormInstance } from "./type"
+import { useMessage } from "@/hooks/useMessage";
+import { useState } from "@/hooks/useState";
+import { defineComponent, nextTick, PropType, provide, ref, watch } from "@vue/composition-api";
+import type { FormInstance } from "./type";
 
 export default defineComponent({
   name: "ProForm",
@@ -35,146 +38,157 @@ export default defineComponent({
     /**  初始化表单数据 */
     initialValue: {
       type: Object,
-      required: false
+      required: false,
     },
     /** 表单验证规则 */
     rules: {
       type: Object,
-      default: () => ({})
+      default: () => ({}),
     },
     /** 标签位置 */
     labelPosition: {
+      type: String as PropType<"left" | "right" | "top">,
+      default: "top",
+    },
+    /** 标签宽度 */
+    labelWidth: {
       type: String,
-      default: "top"
+      default: undefined,
     },
     /** 是否只读 */
     readonly: {
       type: Boolean,
-      default: false
+      default: false,
     },
     /** 是否禁用 */
     disabled: {
       type: Boolean,
-      default: false
+      default: false,
     },
     /** 是否显示底部按钮 */
     showFooter: {
       type: Boolean,
-      default: true
+      default: true,
     },
     /** 取消按钮文本 */
     cancelText: {
       type: String,
-      default: "取消"
+      default: "取消",
     },
     /** 确定按钮文本 */
     confirmText: {
       type: String,
-      default: "提交"
+      default: "提交",
     },
     /** 是否在抽屉中（影响按钮定位） */
     inDrawer: {
       type: Boolean,
-      default: false
-    }
+      default: false,
+    },
+    /** 可等待的提交函数；用于保持 loading 并阻止重复提交 */
+    submitter: {
+      type: Function as PropType<(values: Record<string, unknown>) => void | Promise<void>>,
+      default: undefined,
+    },
   },
   emits: ["submit", "reset", "cancel"],
   setup(props, { emit }) {
     /** 表单实例 */
-    const formRef = ref<FormInstance>()
+    const formRef = ref<FormInstance>();
 
     /** 消息提示 */
-    const message = useMessage()
+    const message = useMessage();
     /** 表单数据 */
-    const [formData, setFormData] = useState({ ...props.initialValue })
+    const createInitialValue = () => ({ ...(props.initialValue ?? {}) });
+    const [formData, setFormData] = useState<Record<string, unknown>>(createInitialValue());
     /** 是否提交中 */
-    const [isSubmitting, setIsSubmitting] = useState(false)
-    /** 是否已经初始化过表单数据 */
-    const [isInitialized, setIsInitialized] = useState(false)
-
-    /** 监听表单数据变化 - 只在首次初始化时重置数据 */
+    const [isSubmitting, setIsSubmitting] = useState(false);
+    /** initialValue 切换时同步新数据，支持同一弹窗连续编辑不同行 */
     watch(
       () => props.initialValue,
-      newValue => {
-        if (newValue && !isInitialized.value) {
-          setFormData({ ...newValue })
-          setIsInitialized(true)
-        }
+      () => {
+        setFormData(createInitialValue());
+        nextTick(() => formRef.value?.clearValidate());
       },
       { deep: true, immediate: true }
-    )
+    );
 
     /** 提交表单 */
     const submit = async () => {
-      try {
-        setIsSubmitting(true)
-        const valid = await new Promise<boolean>(resolve => {
-          formRef.value?.validate((isValid: boolean, invalidFields: Object) => {
-            if (Object.keys(invalidFields).length > 0) {
-              //@ts-ignore
-              message?.error(invalidFields[Object.keys(invalidFields)?.[0]]?.[0]?.message)
-              return resolve(false)
-            }
+      if (isSubmitting.value) return false;
 
-            resolve(isValid)
-          })
-        })
+      try {
+        setIsSubmitting(true);
+        const valid = await validate();
 
         if (valid) {
-          // 确保传递最新的数据
-          emit("submit", { ...formData.value })
-          setFormData({ ...formData.value })
+          const values = { ...(formData.value ?? {}) };
+          await props.submitter?.(values);
+          emit("submit", values);
         }
+
+        return valid;
       } catch (error) {
-        console.error("提交失败:", error)
-        throw error
+        console.error("提交失败:", error);
+        throw error;
       } finally {
-        setIsSubmitting(false)
+        setIsSubmitting(false);
       }
-    }
+    };
 
     // 重置表单
     const reset = () => {
-      formRef.value?.resetFields()
-      setFormData({})
-      setIsInitialized(false)
-      emit("reset")
-    }
+      setFormData(createInitialValue());
+      nextTick(() => formRef.value?.clearValidate());
+      emit("reset");
+    };
 
     // 验证表单
     const validate = () => {
       return new Promise<boolean>(resolve => {
-        formRef.value?.validate((isValid: boolean) => {
-          resolve(isValid)
-        })
-      })
-    }
+        if (!formRef.value) {
+          resolve(false);
+          return;
+        }
+
+        formRef.value.validate((isValid, invalidFields) => {
+          const firstInvalidField = invalidFields?.[Object.keys(invalidFields)[0]];
+          const errorMessage = firstInvalidField?.[0]?.message;
+
+          if (!isValid && errorMessage) {
+            message.error(errorMessage);
+          }
+
+          resolve(isValid);
+        });
+      });
+    };
 
     // 设置字段值
-    const setFieldsValue = (values: Record<string, any>) => {
-      setFormData({ ...formData.value, ...values })
-    }
+    const setFieldsValue = (values: Record<string, unknown>) => {
+      setFormData({ ...(formData.value ?? {}), ...values });
+    };
 
     // 获取字段值
     const getFieldsValue = () => {
-      return { ...formData.value }
-    }
+      return { ...(formData.value ?? {}) };
+    };
 
     // 取消操作
     const handleCancel = () => {
-      emit("cancel")
-      reset()
-    }
+      emit("cancel");
+      reset();
+    };
 
     // 触发提交
     const triggerSubmit = () => {
-      submit()
-    }
+      submit();
+    };
 
     provide("proForm", {
       formRef,
-      getFieldsValue
-    })
+      getFieldsValue,
+    });
 
     return {
       formRef,
@@ -186,10 +200,10 @@ export default defineComponent({
       setFieldsValue,
       getFieldsValue,
       handleCancel,
-      triggerSubmit
-    }
-  }
-})
+      triggerSubmit,
+    };
+  },
+});
 </script>
 
 <style lang="scss" scoped>
@@ -200,7 +214,7 @@ export default defineComponent({
   /** 不允许加一个相对定位 */
 }
 .pro-form {
-  width: calc(100% - 20px);
+  width: 100%;
   z-index: 1;
 }
 
@@ -213,15 +227,13 @@ export default defineComponent({
   margin-top: 20px;
 
   &.in-drawer {
-    position: absolute;
+    position: sticky;
     bottom: 0;
-    right: 0;
     z-index: 100;
     box-shadow: 0 -2px 8px rgba(0, 0, 0, 0.1);
     margin-top: 0;
     width: 100%;
-    margin-left: auto;
-    margin-right: auto;
+    box-sizing: border-box;
   }
 }
 
