@@ -1,4 +1,5 @@
 :root {
+  color-scheme: light;
   --ink: #101828;
   --paper: #ffffff;
   --mist: #f6f8fb;
@@ -10,6 +11,18 @@
   --display: "Avenir Next", "SF Pro Display", "PingFang SC", sans-serif;
   --body: Inter, -apple-system, BlinkMacSystemFont, "Segoe UI", "PingFang SC", sans-serif;
   --mono: "SFMono-Regular", Consolas, "Liberation Mono", Menlo, monospace;
+}
+
+:root[data-theme="dark"] {
+  color-scheme: dark;
+  --ink: #eef2f7;
+  --paper: #0f1117;
+  --mist: #171c26;
+  --primary: #69a7ff;
+  --cyan: #36cfc9;
+  --line: #2b3443;
+  --muted: #aab4c3;
+  --soft-blue: #132e52;
 }
 
 * {
@@ -126,6 +139,35 @@ input:focus-visible {
   justify-content: flex-end;
   align-items: center;
   gap: 12px;
+}
+.theme-toggle {
+  display: grid;
+  flex: 0 0 44px;
+  width: 44px;
+  height: 44px;
+  padding: 11px;
+  place-items: center;
+  border: 0;
+  border-radius: 6px;
+  color: #344054;
+  background: transparent;
+  cursor: pointer;
+  transition:
+    color 0.18s ease,
+    background 0.18s ease;
+}
+.theme-toggle:hover {
+  color: var(--primary);
+  background: var(--mist);
+}
+.theme-toggle svg {
+  width: 20px;
+  height: 20px;
+  fill: none;
+  stroke: currentColor;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  stroke-width: 1.8;
 }
 .search-trigger {
   display: flex;
@@ -1442,5 +1484,352 @@ input:focus-visible {
     transition-duration: 0.01ms !important;
     animation-duration: 0.01ms !important;
     animation-iteration-count: 1 !important;
+  }
+}
+
+html[data-theme="dark"] {
+  scrollbar-color: #3b4656 #11151d;
+  *::-webkit-scrollbar {
+    width: 10px;
+    height: 10px;
+  }
+  *::-webkit-scrollbar-track {
+    background: #11151d;
+  }
+  *::-webkit-scrollbar-thumb {
+    border: 2px solid #11151d;
+    border-radius: 8px;
+    background: #3b4656;
+  }
+  button:focus-visible,
+  a:focus-visible,
+  input:focus-visible {
+    outline-color: rgba(105, 167, 255, 0.72);
+  }
+  .site-header {
+    border-bottom-color: rgba(43, 52, 67, 0.92);
+    background: rgba(15, 17, 23, 0.94);
+  }
+  .header-nav a,
+  .github-link,
+  .theme-toggle,
+  .mobile-menu {
+    color: #c5ceda;
+  }
+  .search-trigger:hover {
+    border-color: #4f79ad;
+    background: #151a23;
+  }
+  .search-trigger kbd {
+    border-color: #3a4554;
+    color: #c5ceda;
+    background: #11151d;
+  }
+  .version,
+  .overview-group__heading span,
+  .stage-note {
+    border-color: #345f91;
+    color: #8dbaff;
+  }
+  .hero,
+  .quality-board {
+    background-color: #11151d;
+  }
+  .hero::after {
+    background: rgba(15, 17, 23, 0.62);
+  }
+  .eyebrow,
+  .hero__copy > p,
+  .nav-section a,
+  .api-table td {
+    color: #b4becb;
+  }
+  .button--quiet,
+  .install-line,
+  .map-node,
+  .family-card,
+  .quality-board ol,
+  .overview-card,
+  .demo-block,
+  .search-dialog {
+    background: #141923;
+  }
+  .install-line code,
+  .docs-toc p,
+  .api-table th {
+    color: #d8dee8;
+  }
+  .hero__stage {
+    border-color: #3b4656;
+    background: rgba(20, 25, 35, 0.78);
+  }
+  .stage-card {
+    border-color: #465263;
+    background: #141923;
+    box-shadow: 16px 16px 0 rgba(0, 0, 0, 0.22);
+  }
+  .stage-card__bar,
+  .demo-block__meta,
+  .api-table th {
+    background: #191f2a;
+  }
+  .stage-card__bar > span,
+  .stage-ruler--top,
+  .stage-ruler--left,
+  .map-node,
+  .quality-board ol,
+  .search-dialog {
+    border-color: #3b4656;
+  }
+  .stage-ruler,
+  .map-line span,
+  .family-card__index,
+  .nav-section p,
+  .nav-section a span,
+  .section-title > span,
+  .search-results__type {
+    color: #8f9baa;
+  }
+  .stage-note--async {
+    border-color: #28766f;
+    color: #72e4da;
+    background: #123432;
+  }
+  .architecture-map,
+  .decision-grid > div,
+  .compat-table th {
+    background: #171c26;
+  }
+  .quality-board > div {
+    background: rgba(17, 21, 29, 0.88);
+  }
+  .stage-card__bar small,
+  .quality-board li em {
+    color: #58d79a;
+  }
+  .family-card svg,
+  .search-results svg,
+  .search-dialog__input svg {
+    stroke: #8f9baa;
+  }
+  .side-nav,
+  .home-mobile-nav {
+    background: #11151d;
+  }
+  .nav-section a:hover {
+    background: #191f2a;
+  }
+  .nav-section a.router-link-exact-active {
+    color: #8dbaff;
+  }
+  .overview-card:hover {
+    border-color: #4f79ad;
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.24);
+  }
+  .overview-card code,
+  .api-table code {
+    color: #8dbaff;
+  }
+  .api-table-wrap,
+  .compat-table {
+    border-color: var(--line);
+    background: #141923;
+  }
+  .search-mask {
+    background: rgba(3, 5, 8, 0.72);
+  }
+  .search-dialog__input input {
+    color: var(--ink);
+    background: transparent;
+  }
+  .search-dialog__input input::placeholder {
+    color: #7f8b9c;
+  }
+  .search-results a:hover {
+    background: #172d4d;
+  }
+  .site-footer {
+    border-top-color: #2b3443;
+    background: #090b10;
+  }
+
+  // Element UI powers the live examples, so its light-only defaults need a docs-level theme layer.
+  .component-demo,
+  .el-form-item__label,
+  .el-checkbox,
+  .el-radio,
+  .el-upload__tip,
+  .el-table,
+  .el-table__expanded-cell,
+  .el-pagination button,
+  .el-pagination span:not([class*="suffix"]),
+  .el-dialog,
+  .el-drawer,
+  .el-message-box,
+  .el-picker-panel,
+  .el-select-dropdown,
+  .el-cascader__dropdown,
+  .el-dropdown-menu,
+  .el-popover {
+    color: #d8dee8;
+  }
+  .el-input__inner,
+  .el-textarea__inner,
+  .el-date-editor .el-range-input,
+  .el-radio-button__inner,
+  .el-checkbox-button__inner,
+  .el-input-group__append,
+  .el-input-group__prepend,
+  .el-input-number__decrease,
+  .el-input-number__increase,
+  .el-button--default,
+  .el-upload-dragger,
+  .el-table,
+  .el-table th,
+  .el-table tr,
+  .el-table__expanded-cell,
+  .el-pagination button,
+  .el-pager li,
+  .el-dialog,
+  .el-drawer,
+  .el-message-box,
+  .el-picker-panel,
+  .el-select-dropdown,
+  .el-cascader__dropdown,
+  .el-dropdown-menu,
+  .el-popover,
+  .el-time-panel,
+  .el-autocomplete-suggestion,
+  .el-card,
+  .el-collapse-item__header,
+  .el-collapse-item__wrap,
+  .el-loading-mask {
+    color: #d8dee8;
+    border-color: #3a4554;
+    background-color: #111720;
+  }
+  .el-input__inner::placeholder,
+  .el-textarea__inner::placeholder,
+  .el-date-editor .el-range-input::placeholder {
+    color: #7f8b9c;
+  }
+  .el-input.is-disabled .el-input__inner,
+  .el-textarea.is-disabled .el-textarea__inner,
+  .el-button.is-disabled,
+  .el-button.is-disabled:hover,
+  .el-checkbox__input.is-disabled .el-checkbox__inner,
+  .el-radio__input.is-disabled .el-radio__inner {
+    border-color: #303a48;
+    color: #7f8b9c;
+    background-color: #1a202a;
+  }
+  .el-checkbox__inner,
+  .el-radio__inner,
+  .el-switch__core,
+  .el-tag,
+  .el-cascader-node:not(.is-disabled):focus,
+  .el-cascader-node:not(.is-disabled):hover,
+  .el-select-dropdown__item.hover,
+  .el-select-dropdown__item:hover,
+  .el-dropdown-menu__item:focus,
+  .el-dropdown-menu__item:not(.is-disabled):hover,
+  .el-picker-panel__footer,
+  .el-date-table td.next-month,
+  .el-date-table td.prev-month {
+    border-color: #3a4554;
+    background-color: #19212c;
+  }
+  .el-checkbox__label,
+  .el-radio__label,
+  .el-date-editor .el-range-separator,
+  .el-select-dropdown__item,
+  .el-cascader-node,
+  .el-date-table th,
+  .el-date-table td.available,
+  .el-picker-panel__icon-btn,
+  .el-date-picker__header-label,
+  .el-dialog__title,
+  .el-drawer__header,
+  .el-message-box__title,
+  .el-message-box__content,
+  .el-table thead {
+    color: #d8dee8;
+  }
+  .el-alert__title,
+  .el-alert__description,
+  .el-upload-list__item-name,
+  .el-table__empty-text {
+    color: #b4becb;
+  }
+  .el-table td,
+  .el-table th.is-leaf,
+  .el-table--border,
+  .el-table--group,
+  .el-table::before,
+  .el-table--border::after,
+  .el-table--group::after,
+  .el-dialog__header,
+  .el-dialog__footer,
+  .el-drawer__header,
+  .el-picker-panel__footer {
+    border-color: #303a48;
+  }
+  .el-table--enable-row-hover .el-table__body tr:hover > td,
+  .el-table__body tr.current-row > td,
+  .el-table__body tr.hover-row > td {
+    background-color: #19212c;
+  }
+  .el-tag {
+    color: #8dbaff;
+    background-color: #172d4d;
+  }
+  .el-tooltip__popper.is-light {
+    border-color: #3a4554;
+    color: #d8dee8;
+    background: #151b24;
+  }
+  .el-tooltip__popper.is-light[x-placement^="top"] .popper__arrow,
+  .el-tooltip__popper.is-light[x-placement^="bottom"] .popper__arrow,
+  .el-tooltip__popper.is-light[x-placement^="left"] .popper__arrow,
+  .el-tooltip__popper.is-light[x-placement^="right"] .popper__arrow {
+    border-color: #3a4554;
+  }
+
+  // Library components with their own scoped light surfaces are overridden only inside the docs.
+  .component-demo .pro-form-footer,
+  .component-demo .tab-header,
+  .component-demo .tab-content,
+  .component-demo .segmented-control,
+  .component-demo .segmented-content,
+  .component-demo .segmented-empty,
+  .component-demo .no-dependency {
+    border-color: #3a4554;
+    color: #d8dee8;
+    background-color: #111720;
+  }
+  .component-demo .tab-item,
+  .component-demo .segmented-item,
+  .component-demo .readonly-display,
+  .component-demo .range-display,
+  .component-demo .range-separator,
+  .component-demo .list-item-index,
+  .component-demo .empty-text,
+  .component-demo .more-images {
+    color: #b4becb;
+  }
+  .component-demo .more-images {
+    background: #19212c;
+  }
+  .component-demo .modal-title,
+  .component-demo .drawer-title,
+  .component-demo .readonly-form .el-input__inner,
+  .component-demo .readonly-form .el-textarea__inner,
+  .component-demo .readonly-form .el-checkbox__label {
+    color: #d8dee8 !important;
+  }
+  .component-demo .tab-item.active,
+  .component-demo .segmented-item.active {
+    color: #8dbaff;
+    background-color: #172d4d;
   }
 }

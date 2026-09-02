@@ -8,6 +8,23 @@
       content="Pro Components Vue2：面向 Vue 2.6 与 Element UI 的 TypeScript 业务组件库。"
     />
     <meta name="theme-color" content="#ffffff" />
+    <script>
+      (() => {
+        const storageKey = "pro-components-vue2-theme";
+        let storedTheme = null;
+        try {
+          storedTheme = window.localStorage.getItem(storageKey);
+        } catch {}
+        const prefersDark = window.matchMedia("(prefers-color-scheme: dark)").matches;
+        const theme =
+          storedTheme === "dark" || (storedTheme !== "light" && prefersDark) ? "dark" : "light";
+        document.documentElement.dataset.theme = theme;
+        document.documentElement.style.colorScheme = theme;
+        document
+          .querySelector('meta[name="theme-color"]')
+          .setAttribute("content", theme === "dark" ? "#0f1117" : "#ffffff");
+      })();
+    </script>
     <link rel="icon" type="image/svg+xml" href="./logo.svg" />
     <title>Pro Components Vue2</title>
   </head>
