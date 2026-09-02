@@ -208,7 +208,7 @@ import "pro-components-vue2/style.css";
 | 导航     | `CustomTabs`         | 键盘可达的受控标签页               |
 | 导航     | `Segmented`          | 可新增、删除和排序的分段面板       |
 
-每个组件的实时示例、代码、Props、Events、Slots 和 Methods 请查看[文档站](https://ihopefulchina.github.io/pro-components-vue2/#/components)。
+每个组件的实时示例、代码、Props、Events、Slots 和 Methods 请查看[文档站](https://ihopefulchina.github.io/pro-components-vue2/components)。
 
 ## Hooks 与工具
 

@@ -2,6 +2,7 @@ import { componentDocs } from "../../docs/src/content/components";
 import ComponentDemo from "../../docs/src/components/ComponentDemo.vue";
 import { guides } from "../../docs/src/content/guides";
 import { hookDocs } from "../../docs/src/content/hooks";
+import router, { getLegacyRoutePath } from "../../docs/src/router";
 import { mount } from "@vue/test-utils";
 
 describe("documentation inventory", () => {
@@ -34,5 +35,14 @@ describe("documentation inventory", () => {
 
     expect(wrapper.text()).toContain("项目名称");
     expect(wrapper.text()).not.toContain("高级配置");
+  });
+
+  it("uses clean URLs, keeps section anchors, and recognizes legacy hash routes", () => {
+    expect(router.mode).toBe("history");
+    expect(router.resolve({ path: "/components/pro-form", hash: "#api" }).href).toBe(
+      "/components/pro-form#api"
+    );
+    expect(getLegacyRoutePath("#/components/pro-form#api")).toBe("/components/pro-form#api");
+    expect(getLegacyRoutePath("#api")).toBeUndefined();
   });
 });

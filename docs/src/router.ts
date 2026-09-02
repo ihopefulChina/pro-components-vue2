@@ -6,6 +6,15 @@ import { hookBySlug } from "./content/hooks";
 
 Vue.use(VueRouter);
 
+export const getLegacyRoutePath = (hash: string) =>
+  hash.startsWith("#/") ? hash.slice(1) : undefined;
+
+const legacyRoutePath = getLegacyRoutePath(window.location.hash);
+if (legacyRoutePath) {
+  const base = import.meta.env.BASE_URL.replace(/\/$/, "");
+  window.history.replaceState(window.history.state, "", `${base}${legacyRoutePath}`);
+}
+
 const routes: RouteConfig[] = [
   { path: "/", name: "home", component: () => import("./views/HomePage.vue") },
   { path: "/guide/:slug", name: "guide", component: () => import("./views/GuidePage.vue") },
@@ -25,7 +34,8 @@ const routes: RouteConfig[] = [
 ];
 
 const router = new VueRouter({
-  mode: "hash",
+  mode: "history",
+  base: import.meta.env.BASE_URL,
   routes,
   scrollBehavior: to => (to.hash ? { selector: to.hash, offset: { x: 0, y: 72 } } : { x: 0, y: 0 }),
 });

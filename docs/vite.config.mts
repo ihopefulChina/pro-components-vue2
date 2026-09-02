@@ -1,10 +1,19 @@
-import { resolve } from "path";
-import { defineConfig } from "vite";
+import { copyFileSync } from "node:fs";
+import { resolve } from "node:path";
+import { defineConfig, Plugin } from "vite";
 import { createVuePlugin } from "vite-plugin-vue2";
+
+const githubPagesFallback: Plugin = {
+  name: "github-pages-spa-fallback",
+  apply: "build",
+  closeBundle() {
+    copyFileSync(resolve(__dirname, "dist/index.html"), resolve(__dirname, "dist/404.html"));
+  },
+};
 
 export default defineConfig(({ command }) => ({
   base: command === "build" ? process.env.DOCS_BASE || "/pro-components-vue2/" : "/",
-  plugins: [createVuePlugin()],
+  plugins: [createVuePlugin(), githubPagesFallback],
   resolve: {
     alias: [
       { find: "@docs", replacement: resolve(__dirname, "src") },

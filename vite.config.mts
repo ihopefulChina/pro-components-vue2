@@ -18,9 +18,10 @@ export default defineConfig({
     }),
   ],
   resolve: {
-    alias: {
-      "@": resolve(__dirname, "src"),
-    },
+    alias: [
+      { find: /^pro-components-vue2$/, replacement: resolve(__dirname, "src/index.ts") },
+      { find: "@", replacement: resolve(__dirname, "src") },
+    ],
   },
   server: {
     host: "localhost",
