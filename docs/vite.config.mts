@@ -1,13 +1,30 @@
-import { copyFileSync } from "node:fs";
+import { copyFileSync, mkdirSync } from "node:fs";
 import { resolve } from "node:path";
 import { defineConfig, Plugin } from "vite";
 import { createVuePlugin } from "vite-plugin-vue2";
+import { componentDocs } from "./src/content/components";
+import { guides } from "./src/content/guides";
+import { hookDocs } from "./src/content/hooks";
+
+const routePaths = [
+  "components",
+  "hooks",
+  ...componentDocs.map(item => `components/${item.slug}`),
+  ...hookDocs.map(item => `hooks/${item.slug}`),
+  ...guides.map(item => `guide/${item.slug}`),
+];
 
 const githubPagesFallback: Plugin = {
   name: "github-pages-spa-fallback",
   apply: "build",
   closeBundle() {
-    copyFileSync(resolve(__dirname, "dist/index.html"), resolve(__dirname, "dist/404.html"));
+    const entry = resolve(__dirname, "dist/index.html");
+    copyFileSync(entry, resolve(__dirname, "dist/404.html"));
+    routePaths.forEach(routePath => {
+      const routeDirectory = resolve(__dirname, "dist", routePath);
+      mkdirSync(routeDirectory, { recursive: true });
+      copyFileSync(entry, resolve(routeDirectory, "index.html"));
+    });
   },
 };
 
