@@ -11,7 +11,7 @@
 
 <p align="center">
   <a href="https://www.npmjs.com/package/pro-components-vue2"><img src="https://img.shields.io/npm/v/pro-components-vue2?color=1677ff" alt="npm version" /></a>
-  <a href="https://github.com/ihopefulChina/pro-components-vue2/actions/workflows/ci.yml"><img src="https://github.com/ihopefulChina/pro-components-vue2/actions/workflows/ci.yml/badge.svg" alt="CI" /></a>
+  <a href="https://github.com/ihopefulChina/pro-components-vue2/actions/workflows/ci.yml"><img src="https://github.com/ihopefulChina/pro-components-vue2/actions/workflows/ci.yml/badge.svg?branch=main" alt="CI on main" /></a>
   <a href="./LICENSE"><img src="https://img.shields.io/badge/license-MIT-101828" alt="MIT license" /></a>
   <a href="https://www.npmjs.com/package/pro-components-vue2"><img src="https://img.shields.io/npm/types/pro-components-vue2?color=13c2c2" alt="TypeScript declarations" /></a>
 </p>
@@ -66,6 +66,8 @@ Composition API 必须先于组件库注册。
 
 ### 3. 使用 ProForm
 
+下面用中性的 `/api/projects` 展示完整异步提交；接入时替换为项目自己的服务地址与错误处理。
+
 ```vue
 <template>
   <ProForm :initial-value="record" :rules="rules" :submitter="save">
@@ -92,7 +94,7 @@ import { defineComponent } from "@vue/composition-api";
 
 export default defineComponent({
   setup() {
-    const record = { name: "会员中心", status: 1 };
+    const record = { name: "示例项目", status: 1 };
     const rules = {
       name: [{ required: true, message: "请输入项目名称", trigger: "blur" }],
     };
@@ -101,7 +103,13 @@ export default defineComponent({
       { label: "已暂停", value: 0 },
     ];
     const save = async (values: Record<string, unknown>) => {
-      await api.save(values);
+      const response = await fetch("/api/projects", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(values),
+      });
+
+      if (!response.ok) throw new Error("保存失败");
     };
 
     return { record, rules, save, statusOptions };
@@ -114,6 +122,8 @@ export default defineComponent({
 
 ### 4. 使用 ProTable
 
+列表同样使用可替换的 `/api/users` 端点；示例本身不依赖未声明的全局 `api`。
+
 ```vue
 <template>
   <ProTable :columns="columns" :request="loadUsers" row-key="id">
@@ -125,6 +135,16 @@ export default defineComponent({
 
 <script lang="ts">
 import type { ICommonTableColumn } from "pro-components-vue2";
+
+interface UserRow {
+  id: string;
+  name: string;
+  status: number;
+}
+
+const openEditor = (row: UserRow) => {
+  window.location.assign(`/users/${encodeURIComponent(row.id)}/edit`);
+};
 
 const columns: ICommonTableColumn[] = [
   { prop: "name", label: "姓名", searchPlaceholder: "搜索姓名" },
@@ -142,12 +162,29 @@ const columns: ICommonTableColumn[] = [
     label: "操作",
     type: "actions",
     hideInSearch: true,
-    buttons: [{ text: "编辑", type: "text", onClick: row => edit(row) }],
+    buttons: [
+      {
+        text: "编辑",
+        type: "text",
+        onClick: row => openEditor(row as UserRow),
+      },
+    ],
   },
 ];
 
 const loadUsers = async (params: Record<string, unknown>) => {
-  const result = await api.list(params);
+  const response = await fetch("/api/users", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(params),
+  });
+
+  if (!response.ok) return { data: [], total: 0, success: false };
+
+  const result = (await response.json()) as {
+    list: UserRow[];
+    total: number;
+  };
   return { data: result.list, total: result.total, success: true };
 };
 </script>
@@ -281,14 +318,14 @@ pnpm build:docs
 
 ## 发布
 
-正式包只包含 `dist/`、`README.md` 和 `LICENSE`。发布前脚本会执行格式、Lint、类型、回归和库构建：
+正式包包含 `dist/`、`assets/logo.svg`、`README.md`、`LICENSE` 与 npm 必需的 `package.json`。发布前脚本会执行格式、Lint、类型、回归和库构建：
 
 ```bash
 npm pack --dry-run
 npm publish --access public
 ```
 
-CI 只在 `v*` tag 上执行 npm 发布，普通 `main` push 不会创建新版本。
+当前自动发布尚未接通：workflow 的 `publish` job 带有 `v*` tag 条件，但触发器只监听 `main` / `develop` 分支 push，单独推送 tag 不会启动该 job。在补齐 tag 触发并验证 npm 凭证前，应按人工发布流程执行，并以 npm registry 的实际版本为准。
 
 ## 贡献
 
